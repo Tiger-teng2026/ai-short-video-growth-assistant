@@ -89,7 +89,6 @@ export function GenerateForm() {
 
     setIsGenerating(true);
     setProgressStep(1);
-    recordGeneration();
 
     try {
       const response = await fetch("/api/generate", {
@@ -128,6 +127,7 @@ export function GenerateForm() {
       };
 
       sessionStorage.setItem(CONTENT_PACKAGE_STORAGE_KEY, JSON.stringify(stored));
+      recordGeneration();
       trackEvent("generate_success", {
         template: selectedTemplate.id,
         goal: selectedGoal.id,

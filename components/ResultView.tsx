@@ -6,6 +6,7 @@ import { CopyButton } from "@/components/CopyButton";
 import { trackEvent } from "@/lib/analytics";
 import {
   CONTENT_PACKAGE_STORAGE_KEY,
+  parseContentPackage,
   type StoredContentPackage,
 } from "@/lib/content-package";
 import { getGoal } from "@/lib/goals";
@@ -21,6 +22,7 @@ const checklist = [
 
 export function ResultView() {
   const [pack, setPack] = useState<StoredContentPackage | null>(null);
+  const [invalid, setInvalid] = useState(false);
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
@@ -28,9 +30,19 @@ export function ResultView() {
 
     if (raw) {
       try {
-        setPack(JSON.parse(raw) as StoredContentPackage);
+        const parsed = JSON.parse(raw) as unknown;
+        const nextPack = readStoredContentPackage(parsed);
+
+        if (nextPack) {
+          setPack(nextPack);
+          setInvalid(false);
+        } else {
+          setPack(null);
+          setInvalid(true);
+        }
       } catch {
         setPack(null);
+        setInvalid(true);
       }
     }
 
@@ -61,13 +73,15 @@ export function ResultView() {
           Your Short Video Production Plan
         </h1>
         <p className="mt-3 text-slate-600 leading-7">
-          A ready-to-record content workflow for your SaaS product.
+          {invalid
+            ? "This production plan could not be loaded. The saved data is missing or invalid."
+            : "A ready-to-record content workflow for your SaaS product."}
         </p>
         <Link
           href="/generate"
           className="mt-8 inline-flex h-12 items-center rounded-lg bg-slate-900 px-5 text-sm font-medium text-white transition-colors hover:bg-slate-800"
         >
-          Generate Content Package
+          {invalid ? "Back to Generate" : "Generate Content Package"}
         </Link>
       </div>
     );
@@ -232,6 +246,46 @@ export function ResultView() {
       </Link>
     </div>
   );
+}
+
+function readStoredContentPackage(
+  raw: unknown,
+): StoredContentPackage | null {
+  if (!raw || typeof raw !== "object") {
+    return null;
+  }
+
+  const data = raw as Record<string, unknown>;
+  const platform = asRequiredString(data.platform);
+  const productDescription = asRequiredString(data.productDescription);
+  const goal = asRequiredString(data.goal);
+  const template = asRequiredString(data.template);
+  const videoLength = asRequiredString(data.videoLength);
+
+  if (!platform || !productDescription || !goal || !template || !videoLength) {
+    return null;
+  }
+
+  try {
+    return {
+      platform,
+      productDescription,
+      goal,
+      template,
+      videoLength,
+      ...parseContentPackage(data),
+    };
+  } catch {
+    return null;
+  }
+}
+
+function asRequiredString(value: unknown): string | null {
+  if (typeof value !== "string" || value.trim().length === 0) {
+    return null;
+  }
+
+  return value.trim();
 }
 
 function scriptModuleTitle(videoLength: string): string {
