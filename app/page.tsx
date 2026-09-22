@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { BrandLogo } from "@/components/BrandLogo";
 import { TrackPageEvent } from "@/components/TrackPageEvent";
 import {
   getSiteUrl,
@@ -69,6 +70,7 @@ export default function Home() {
     operatingSystem: "Web",
     description: SITE_DESCRIPTION,
     url: siteUrl,
+    image: `${siteUrl}/logo.jpg`,
     offers: {
       "@type": "Offer",
       price: "0",
@@ -85,7 +87,8 @@ export default function Home() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <section className="flex flex-col items-start py-20 sm:py-28">
-        <p className="text-sm font-medium uppercase tracking-wide text-slate-500">
+        <BrandLogo variant="lockup" height={88} priority />
+        <p className="mt-8 text-sm font-medium uppercase tracking-wide text-slate-500">
           AI SaaS Founder Content Workflow Assistant
         </p>
         <h1 className="mt-3 max-w-3xl text-4xl font-semibold tracking-tight text-slate-900 sm:text-5xl sm:leading-tight">
