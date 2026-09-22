@@ -14,8 +14,8 @@ export default function GeneratePage() {
         Generate a content package
       </h1>
       <p className="mt-3 text-slate-600 leading-7">
-        Choose a platform, pick a content template, and turn a product idea into
-        a ready-to-film short video package.
+        Choose a platform, set a video goal, pick a template, and turn a product
+        idea into a ready-to-film short video package.
       </p>
       <div className="mt-10">
         <GenerateForm />

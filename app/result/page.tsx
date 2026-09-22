@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { ResultView } from "@/components/ResultView";
 
 export const metadata: Metadata = {
-  title: "Founder Content Package",
-  description: "Your founder content package: platform, content type, script, and recording plan.",
+  title: "Short Video Production Plan",
+  description: "A ready-to-record content workflow for your SaaS product.",
   robots: {
     index: false,
     follow: false,

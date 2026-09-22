@@ -1,6 +1,7 @@
 export type GenerateInput = {
   platform: string;
   productDescription: string;
+  goal: string;
   template: string;
   videoLength: string;
 };

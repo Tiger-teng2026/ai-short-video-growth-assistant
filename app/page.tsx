@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { TrackPageEvent } from "@/components/TrackPageEvent";
 import {
   getSiteUrl,
   SITE_DESCRIPTION,
@@ -78,6 +79,7 @@ export default function Home() {
 
   return (
     <div className="mx-auto max-w-5xl px-6">
+      <TrackPageEvent event="landing_view" />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

@@ -17,7 +17,7 @@ export function UpgradeButton({
   async function handleUpgrade() {
     setError("");
     setIsLoading(true);
-    trackEvent("click_upgrade", { plan });
+    trackEvent("checkout_click", { plan });
 
     try {
       const response = await fetch("/api/checkout", {

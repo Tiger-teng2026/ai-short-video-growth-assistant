@@ -6,9 +6,11 @@ import { trackEvent } from "@/lib/analytics";
 export function CopyButton({
   text,
   source,
+  compact = false,
 }: {
   text: string;
   source?: string;
+  compact?: boolean;
 }) {
   const [copied, setCopied] = useState(false);
 
@@ -27,7 +29,12 @@ export function CopyButton({
     <button
       type="button"
       onClick={handleCopy}
-      className="text-xs font-medium text-slate-500 transition-colors hover:text-slate-900"
+      aria-label={copied ? "Copied" : `Copy ${source ?? "content"}`}
+      className={
+        compact
+          ? "inline-flex h-8 shrink-0 items-center justify-center rounded-md border border-slate-200 px-2.5 text-xs font-medium text-slate-600 transition-colors hover:border-slate-300 hover:text-slate-900"
+          : "inline-flex h-9 w-full items-center justify-center rounded-lg border border-slate-200 px-3 text-xs font-medium text-slate-700 transition-colors hover:border-slate-300 hover:text-slate-900 sm:w-auto"
+      }
     >
       {copied ? "Copied" : "Copy"}
     </button>

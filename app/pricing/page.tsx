@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { TrackPageEvent } from "@/components/TrackPageEvent";
 import { UpgradeButton } from "@/components/UpgradeButton";
 import { plans } from "@/lib/plans";
 
@@ -11,6 +12,7 @@ export const metadata: Metadata = {
 export default function PricingPage() {
   return (
     <div className="mx-auto max-w-5xl px-6 py-16">
+      <TrackPageEvent event="pricing_view" />
       <p className="text-sm font-medium uppercase tracking-wide text-slate-500">
         Pricing
       </p>

@@ -59,9 +59,10 @@ export default function PrivacyPage() {
         <section>
           <h2 className="text-base font-semibold text-slate-900">Cookies</h2>
           <p className="mt-2">
-            We do not use advertising cookies. Browser storage is used only for
-            free usage limits, local analytics events, and your latest content
-            package.
+            We do not use advertising cookies. If Google Analytics 4 is
+            configured, gtag may set analytics cookies to measure product usage.
+            Browser storage is also used for free usage limits, local analytics
+            events, and your latest content package.
           </p>
         </section>
 

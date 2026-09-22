@@ -3,6 +3,7 @@ import {
   type GenerateInput,
 } from "@/lib/content-package";
 import { generateJsonWithDeepSeek, DeepSeekError } from "@/lib/deepseek";
+import { getGoal, goals } from "@/lib/goals";
 import { buildTemplatePrompt, getTemplate, templates } from "@/lib/templates";
 
 export const maxDuration = 60;
@@ -18,14 +19,26 @@ export async function POST(request: Request) {
 
   const platform = body.platform?.trim();
   const productDescription = body.productDescription?.trim();
+  const goal = body.goal?.trim();
   const template = body.template?.trim();
   const videoLength = body.videoLength?.trim();
 
-  if (!platform || !productDescription || !template || !videoLength) {
+  if (!platform || !productDescription || !goal || !template || !videoLength) {
     return Response.json(
       {
         error:
-          "platform, productDescription, template, and videoLength are required.",
+          "platform, productDescription, goal, template, and videoLength are required.",
+      },
+      { status: 400 },
+    );
+  }
+
+  const selectedGoal = getGoal(goal);
+
+  if (!selectedGoal) {
+    return Response.json(
+      {
+        error: `Unknown goal. Use ${goals.map((item) => item.id).join(", ")}.`,
       },
       { status: 400 },
     );
@@ -45,6 +58,7 @@ export async function POST(request: Request) {
   const input: GenerateInput = {
     platform,
     productDescription,
+    goal: selectedGoal.id,
     template: selectedTemplate.id,
     videoLength,
   };

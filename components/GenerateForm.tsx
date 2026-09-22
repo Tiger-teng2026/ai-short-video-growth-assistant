@@ -10,10 +10,18 @@ import {
   type StoredContentPackage,
 } from "@/lib/content-package";
 import { templates } from "@/lib/templates";
+import { goals } from "@/lib/goals";
 import { canGenerateFree, recordGeneration } from "@/lib/usage";
 
 const platforms = ["TikTok", "YouTube Shorts", "Instagram Reels"] as const;
 const videoLengths = ["15 seconds", "30 seconds", "60 seconds"] as const;
+
+const generationSteps = [
+  "Analyzing your SaaS product...",
+  "Creating video strategy...",
+  "Writing script and recording plan...",
+  "Preparing your production plan...",
+];
 
 type Platform = (typeof platforms)[number];
 type VideoLength = (typeof videoLengths)[number];
@@ -22,20 +30,38 @@ export function GenerateForm() {
   const router = useRouter();
   const [platform, setPlatform] = useState<Platform>("TikTok");
   const [productDescription, setProductDescription] = useState("");
+  const [goalId, setGoalId] = useState(goals[0].id);
   const [templateId, setTemplateId] = useState(templates[0].id);
   const [videoLength, setVideoLength] = useState<VideoLength>("60 seconds");
   const [error, setError] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
+  const [progressStep, setProgressStep] = useState(0);
   const [atFreeLimit, setAtFreeLimit] = useState(false);
 
   useEffect(() => {
     setAtFreeLimit(!canGenerateFree());
   }, []);
 
+  useEffect(() => {
+    if (!isGenerating) {
+      return;
+    }
+
+    setProgressStep(1);
+    const timer = window.setInterval(() => {
+      setProgressStep((current) => (current < generationSteps.length ? current + 1 : current));
+    }, 1800);
+
+    return () => window.clearInterval(timer);
+  }, [isGenerating]);
+
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (isGenerating) {
+      return;
+    }
     setError("");
-    trackEvent("click_generate", { template: templateId, platform });
+    trackEvent("start_generate", { template: templateId, goal: goalId, platform });
 
     const trimmedDescription = productDescription.trim();
     if (!trimmedDescription) {
@@ -43,7 +69,13 @@ export function GenerateForm() {
       return;
     }
 
+    const selectedGoal = goals.find((item) => item.id === goalId);
     const selectedTemplate = templates.find((item) => item.id === templateId);
+
+    if (!selectedGoal) {
+      setError("Select a video goal.");
+      return;
+    }
 
     if (!selectedTemplate) {
       setError("Select a content template.");
@@ -56,11 +88,8 @@ export function GenerateForm() {
     }
 
     setIsGenerating(true);
+    setProgressStep(1);
     recordGeneration();
-    trackEvent("start_generation", {
-      template: selectedTemplate.id,
-      platform,
-    });
 
     try {
       const response = await fetch("/api/generate", {
@@ -71,6 +100,7 @@ export function GenerateForm() {
         body: JSON.stringify({
           platform,
           productDescription: trimmedDescription,
+          goal: selectedGoal.id,
           template: selectedTemplate.id,
           videoLength,
         }),
@@ -81,7 +111,9 @@ export function GenerateForm() {
         | null;
 
       if (!response.ok) {
-        setError(payload?.error || "Failed to generate content package.");
+        setError("Something went wrong. Please try again.");
+        setIsGenerating(false);
+        setProgressStep(0);
         return;
       }
 
@@ -89,17 +121,25 @@ export function GenerateForm() {
       const stored: StoredContentPackage = {
         platform,
         productDescription: trimmedDescription,
+        goal: selectedGoal.id,
         template: selectedTemplate.id,
         videoLength,
         ...contentPackage,
       };
 
       sessionStorage.setItem(CONTENT_PACKAGE_STORAGE_KEY, JSON.stringify(stored));
+      trackEvent("generate_success", {
+        template: selectedTemplate.id,
+        goal: selectedGoal.id,
+        platform,
+      });
+      setIsGenerating(false);
+      setProgressStep(0);
       router.push("/result");
     } catch {
-      setError("Failed to generate content package.");
-    } finally {
+      setError("Something went wrong. Please try again.");
       setIsGenerating(false);
+      setProgressStep(0);
     }
   }
 
@@ -152,6 +192,38 @@ export function GenerateForm() {
 
       <section>
         <p className="text-sm font-medium text-slate-500">Step 3</p>
+        <h2 className="mt-1 text-lg font-semibold text-slate-900">Video Goal</h2>
+        <div className="mt-4 space-y-3">
+          {goals.map((option) => {
+            const selected = goalId === option.id;
+            return (
+              <button
+                key={option.id}
+                type="button"
+                disabled={isGenerating}
+                onClick={() => setGoalId(option.id)}
+                className={`w-full rounded-xl border px-4 py-3 text-left transition-colors ${
+                  selected
+                    ? "border-slate-900 bg-slate-900 text-white"
+                    : "border-slate-200 bg-white text-slate-900 hover:border-slate-300"
+                }`}
+              >
+                <span className="block text-sm font-medium">{option.name}</span>
+                <span
+                  className={`mt-1 block text-sm ${
+                    selected ? "text-slate-300" : "text-slate-500"
+                  }`}
+                >
+                  {option.description}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </section>
+
+      <section>
+        <p className="text-sm font-medium text-slate-500">Step 4</p>
         <h2 className="mt-1 text-lg font-semibold text-slate-900">
           Content Template
         </h2>
@@ -185,7 +257,7 @@ export function GenerateForm() {
       </section>
 
       <section>
-        <p className="text-sm font-medium text-slate-500">Step 4</p>
+        <p className="text-sm font-medium text-slate-500">Step 5</p>
         <h2 className="mt-1 text-lg font-semibold text-slate-900">
           Video Length
         </h2>
@@ -229,10 +301,34 @@ export function GenerateForm() {
             <button
               type="submit"
               disabled={isGenerating}
-              className="inline-flex h-12 items-center rounded-lg bg-slate-900 px-5 text-sm font-medium text-white transition-colors hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
+              className="inline-flex min-h-12 items-center rounded-lg bg-slate-900 px-5 text-sm font-medium text-white transition-colors hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {isGenerating ? "Generating..." : "Generate Content Package"}
+              {isGenerating
+                ? "Generating Your Video Plan..."
+                : "Generate Content Package"}
             </button>
+            {isGenerating ? (
+              <ol className="mt-6 space-y-3" aria-live="polite">
+                {generationSteps.map((label, index) => {
+                  const step = index + 1;
+                  const reached = progressStep >= step;
+                  return (
+                    <li key={label}>
+                      <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
+                        Step {step}:
+                      </p>
+                      <p
+                        className={`mt-1 text-sm leading-6 ${
+                          reached ? "text-slate-900" : "text-slate-400"
+                        }`}
+                      >
+                        {label}
+                      </p>
+                    </li>
+                  );
+                })}
+              </ol>
+            ) : null}
             {error ? (
               <p className="mt-4 text-sm leading-6 text-red-600" role="alert">
                 {error}
