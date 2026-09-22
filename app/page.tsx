@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { BrandLogo } from "@/components/BrandLogo";
 import { TrackPageEvent } from "@/components/TrackPageEvent";
 import {
   getSiteUrl,
@@ -7,6 +6,21 @@ import {
   SITE_NAME,
   SITE_TAGLINE,
 } from "@/lib/site";
+
+const heroValues = [
+  {
+    title: "Viral Hooks",
+    body: "Open with lines built to stop the scroll in the first three seconds.",
+  },
+  {
+    title: "Ready-to-record Scripts",
+    body: "Get a spoken opening, body, and CTA you can film on a phone.",
+  },
+  {
+    title: "Creator Workflow",
+    body: "Move from product idea to a publish-ready short-video plan.",
+  },
+];
 
 const problems = [
   "No content ideas",
@@ -87,23 +101,38 @@ export default function Home() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <section className="flex flex-col items-start py-20 sm:py-28">
-        <BrandLogo variant="lockup" height={88} priority />
-        <p className="mt-8 text-sm font-medium uppercase tracking-wide text-slate-500">
+        <p className="text-sm font-medium uppercase tracking-wide text-slate-500">
           AI SaaS Founder Content Workflow Assistant
         </p>
         <h1 className="mt-3 max-w-3xl text-4xl font-semibold tracking-tight text-slate-900 sm:text-5xl sm:leading-tight">
           Create SaaS Growth Content Without a Marketing Team
         </h1>
         <p className="mt-5 max-w-2xl text-lg leading-8 text-slate-600">
-          Turn your product ideas into ready-to-film TikTok, YouTube Shorts, and
-          Reels content packages.
+          Turn your SaaS idea into a complete short-video package: hooks,
+          scripts, shots, captions, and CTAs.
         </p>
         <Link
           href="/generate"
-          className="mt-8 inline-flex h-12 items-center rounded-lg bg-slate-900 px-5 text-sm font-medium text-white transition-colors hover:bg-slate-800"
+          className="mt-8 inline-flex h-12 items-center rounded-lg bg-slate-900 px-6 text-sm font-medium text-white transition-colors hover:bg-slate-800"
         >
-          Generate Your First Video Free
+          Create My First Video Plan
         </Link>
+      </section>
+
+      <section className="pb-16">
+        <div className="grid gap-4 sm:grid-cols-3">
+          {heroValues.map((item) => (
+            <article
+              key={item.title}
+              className="rounded-xl border border-slate-200 bg-white p-5"
+            >
+              <h2 className="text-sm font-semibold text-slate-900">
+                {item.title}
+              </h2>
+              <p className="mt-2 text-sm leading-6 text-slate-600">{item.body}</p>
+            </article>
+          ))}
+        </div>
       </section>
 
       <section className="border-t border-slate-200 py-16">
