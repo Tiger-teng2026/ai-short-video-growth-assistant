@@ -47,6 +47,38 @@ export function getRecordingSceneBudget(videoLength: string): {
   return { min: 3, max: 4, label: "3-4 scenes" };
 }
 
+export function getVideoAssemblyClipBudget(videoLength: string): {
+  min: number;
+  max: number;
+  label: string;
+} {
+  const scenes = getRecordingSceneBudget(videoLength);
+  return {
+    min: scenes.min,
+    max: scenes.max,
+    label: scenes.label.replace("scenes", "clips"),
+  };
+}
+
+export type VideoAssemblyClip = {
+  clipNumber: number;
+  sourceScene: string;
+  duration: string;
+  purpose: string;
+  editingInstruction: string;
+};
+
+export type VideoAssemblyTransition = {
+  from: string;
+  to: string;
+  instruction: string;
+};
+
+export type VideoAssembly = {
+  clipOrder: VideoAssemblyClip[];
+  transitions: VideoAssemblyTransition[];
+};
+
 export type EditingGuide = {
   pacing: string;
   cuts: string[];
@@ -66,6 +98,7 @@ export type PublishingPackage = {
 export type ProductionBlueprint = {
   videoStrategy: VideoStrategy;
   recordingGuide: RecordingScene[];
+  videoAssembly: VideoAssembly;
   voiceScript: VoiceScript;
   editingGuide: EditingGuide;
   publishingPackage: PublishingPackage;
@@ -212,6 +245,10 @@ export function parseContentPackage(raw: unknown): ContentPackage {
   };
 
   const editingGuide = parseEditingGuide(editingRaw);
+  const videoAssembly = parseVideoAssembly(
+    readObject(data, ["videoAssembly", "video_assembly"]),
+    recordingGuide,
+  );
   const publishingPackage: PublishingPackage = {
     caption,
     hashtags,
@@ -238,6 +275,7 @@ export function parseContentPackage(raw: unknown): ContentPackage {
   return {
     videoStrategy,
     recordingGuide,
+    videoAssembly,
     voiceScript: script,
     editingGuide,
     publishingPackage,
@@ -358,6 +396,137 @@ function parseEditingGuide(raw: Record<string, unknown> | null): EditingGuide {
       firstFilledString([raw.captions, raw.subtitles]) ||
       DEFAULT_EDITING_GUIDE.captions,
   };
+}
+
+function parseVideoAssembly(
+  raw: Record<string, unknown> | null,
+  scenes: RecordingScene[],
+): VideoAssembly {
+  const fallback = fallbackVideoAssembly(scenes);
+
+  if (!raw) {
+    return fallback;
+  }
+
+  const clipOrder = parseAssemblyClips(
+    readValue(raw, ["clipOrder", "clip_order", "clips"]),
+  );
+  const transitions = parseAssemblyTransitions(
+    readValue(raw, ["transitions", "sceneTransitions", "scene_transitions"]),
+  );
+
+  if (clipOrder.length === 0) {
+    return fallback;
+  }
+
+  return {
+    clipOrder,
+    transitions: transitions.length > 0 ? transitions : fallback.transitions,
+  };
+}
+
+function parseAssemblyClips(raw: unknown): VideoAssemblyClip[] {
+  if (!Array.isArray(raw)) {
+    return [];
+  }
+
+  const clips: VideoAssemblyClip[] = [];
+
+  raw.forEach((item, index) => {
+    if (!item || typeof item !== "object") {
+      return;
+    }
+
+    const row = item as Record<string, unknown>;
+    const sourceScene = firstFilledString([
+      row.sourceScene,
+      row.source_scene,
+      row.scene,
+    ]);
+    const purpose = firstFilledString([
+      row.purpose,
+      row.keep,
+      row.visual,
+    ]);
+    const editingInstruction = firstFilledString([
+      row.editingInstruction,
+      row.editing_instruction,
+      row.instruction,
+    ]);
+
+    if (!sourceScene || !purpose || !editingInstruction) {
+      return;
+    }
+
+    clips.push({
+      clipNumber:
+        typeof row.clipNumber === "number" && row.clipNumber > 0
+          ? row.clipNumber
+          : typeof row.clip_number === "number" && row.clip_number > 0
+            ? row.clip_number
+            : index + 1,
+      sourceScene,
+      duration: firstFilledString([row.duration, row.position, row.time]) || "",
+      purpose,
+      editingInstruction,
+    });
+  });
+
+  return clips;
+}
+
+function parseAssemblyTransitions(raw: unknown): VideoAssemblyTransition[] {
+  if (!Array.isArray(raw)) {
+    return [];
+  }
+
+  const transitions: VideoAssemblyTransition[] = [];
+
+  raw.forEach((item) => {
+    if (!item || typeof item !== "object") {
+      return;
+    }
+
+    const row = item as Record<string, unknown>;
+    const from = firstFilledString([row.from, row.source, row.sourceScene]);
+    const to = firstFilledString([row.to, row.target, row.nextScene]);
+    const instruction = firstFilledString([
+      row.instruction,
+      row.transition,
+      row.note,
+    ]);
+
+    if (!from || !to || !instruction) {
+      return;
+    }
+
+    transitions.push({ from, to, instruction });
+  });
+
+  return transitions;
+}
+
+function fallbackVideoAssembly(scenes: RecordingScene[]): VideoAssembly {
+  const clipOrder = scenes.map((scene, index) => ({
+    clipNumber: index + 1,
+    sourceScene: `Scene ${scene.scene}`,
+    duration: scene.duration,
+    purpose: scene.visual,
+    editingInstruction: scene.visual
+      ? `Keep ${scene.visual.replace(/\.$/, "")}. Cut extra frames and unused takes.`
+      : "Keep the usable take. Cut extra frames and unused takes.",
+  }));
+
+  const transitions = scenes.slice(0, -1).map((scene, index) => {
+    const next = scenes[index + 1];
+    return {
+      from: `Scene ${scene.scene}`,
+      to: `Scene ${next.scene}`,
+      instruction: `Switch to Scene ${next.scene} after Scene ${scene.scene}.`,
+    };
+  });
+
+  return { clipOrder, transitions };
 }
 
 function formatSceneLine(scene: RecordingScene): string {

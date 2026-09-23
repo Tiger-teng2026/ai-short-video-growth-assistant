@@ -9,6 +9,8 @@ import {
   parseContentPackage,
   type RecordingScene,
   type StoredContentPackage,
+  type VideoAssemblyClip,
+  type VideoAssemblyTransition,
 } from "@/lib/content-package";
 import { getGoal } from "@/lib/goals";
 import { getTemplate } from "@/lib/templates";
@@ -102,6 +104,18 @@ export function ResultView() {
   ].join("\n");
 
   const recordingText = scenes.map(formatSceneCopy).join("\n\n");
+  const assembly = pack.videoAssembly ?? { clipOrder: [], transitions: [] };
+  const assemblyText = [
+    ...assembly.clipOrder.map(formatClipCopy),
+    assembly.transitions.length > 0
+      ? [
+          "Scene Transitions",
+          ...assembly.transitions.map(formatTransitionCopy),
+        ].join("\n")
+      : "",
+  ]
+    .filter(Boolean)
+    .join("\n\n");
   const voiceText = [
     `Opening: ${voice.opening}`,
     `Body: ${voice.body}`,
@@ -134,8 +148,7 @@ export function ResultView() {
         Start with the Recording Guide
       </h1>
       <p className="mt-3 max-w-2xl text-slate-600 leading-7">
-        Each scene tells you the duration, where to point the camera, what to
-        film, your action, and what happens on screen for {pack.platform}.
+        Record your clips, put them together, and publish your short video.
       </p>
 
       <dl className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
@@ -162,38 +175,47 @@ export function ResultView() {
 
         <PackageSection
           number="02"
-          title="Video Strategy"
-          description="What this video is for, who it talks to, and how it should open."
-          copyText={strategyText}
+          title="Video Assembly"
+          description="After you film, put the clips in this order. Each clip says what to keep and what to cut."
+          copyText={assemblyText}
         >
-          <div className="grid gap-4 sm:grid-cols-2">
-            <Fact label="Concept" value={pack.videoStrategy.concept} />
-            <Fact label="Target viewer" value={pack.videoStrategy.targetViewer} />
-            <Fact label="Hook strategy" value={pack.videoStrategy.hookStrategy} />
-            <Fact label="Promise" value={pack.videoStrategy.promise} />
-            <Fact
-              label="CTA strategy"
-              value={pack.videoStrategy.ctaStrategy}
-              className="sm:col-span-2"
-            />
-          </div>
-          {pack.hooks.length > 0 ? (
-            <ol className="mt-5 space-y-3">
-              {pack.hooks.map((hook, index) => (
-                <li
-                  key={`hook-${index}`}
-                  className="flex flex-col gap-3 rounded-lg border border-slate-100 bg-slate-50 p-3 sm:flex-row sm:items-start sm:justify-between"
-                >
-                  <p className="text-sm font-medium leading-7 text-slate-900">
-                    <span className="mr-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
-                      Hook {index + 1}
-                    </span>
-                    {hook}
-                  </p>
-                  <CopyButton text={hook} source={`Hook ${index + 1}`} compact />
-                </li>
-              ))}
-            </ol>
+          <ol className="space-y-5">
+            {assembly.clipOrder.map((clip, index) => (
+              <ClipCard key={`clip-${clip.clipNumber}-${index}`} clip={clip} />
+            ))}
+          </ol>
+          {assembly.transitions.length > 0 ? (
+            <div className="mt-5">
+              <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                Scene Transition
+              </p>
+              <ul className="mt-3 space-y-3">
+                {assembly.transitions.map((transition, index) => (
+                  <li
+                    key={`transition-${index}`}
+                    className="rounded-xl border border-slate-200 bg-slate-50 p-4"
+                  >
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium leading-6 text-slate-900">
+                          {transition.from} → {transition.to}
+                        </p>
+                        <p className="mt-1 text-sm leading-6 text-slate-700">
+                          {transition.instruction}
+                        </p>
+                      </div>
+                      <div className="w-full shrink-0 sm:w-auto">
+                        <CopyButton
+                          text={formatTransitionCopy(transition)}
+                          source={`Scene Transition ${index + 1}`}
+                          compact
+                        />
+                      </div>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
           ) : null}
         </PackageSection>
 
@@ -212,8 +234,8 @@ export function ResultView() {
 
         <PackageSection
           number="04"
-          title="Editing Guide"
-          description="How to cut, caption, and finish the video without an editor."
+          title="Quick Editing Tips"
+          description="A few simple notes to cut, caption, and finish the video without an editor."
           copyText={editingText}
         >
           <div className="space-y-4">
@@ -294,6 +316,43 @@ export function ResultView() {
             ))}
           </ul>
         </PackageSection>
+
+        <PackageSection
+          number=""
+          title="Video Strategy"
+          description="What this video is for, who it talks to, and how it should open."
+          copyText={strategyText}
+        >
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Fact label="Concept" value={pack.videoStrategy.concept} />
+            <Fact label="Target viewer" value={pack.videoStrategy.targetViewer} />
+            <Fact label="Hook strategy" value={pack.videoStrategy.hookStrategy} />
+            <Fact label="Promise" value={pack.videoStrategy.promise} />
+            <Fact
+              label="CTA strategy"
+              value={pack.videoStrategy.ctaStrategy}
+              className="sm:col-span-2"
+            />
+          </div>
+          {pack.hooks.length > 0 ? (
+            <ol className="mt-5 space-y-3">
+              {pack.hooks.map((hook, index) => (
+                <li
+                  key={`hook-${index}`}
+                  className="flex flex-col gap-3 rounded-lg border border-slate-100 bg-slate-50 p-3 sm:flex-row sm:items-start sm:justify-between"
+                >
+                  <p className="text-sm font-medium leading-7 text-slate-900">
+                    <span className="mr-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                      Hook {index + 1}
+                    </span>
+                    {hook}
+                  </p>
+                  <CopyButton text={hook} source={`Hook ${index + 1}`} compact />
+                </li>
+              ))}
+            </ol>
+          ) : null}
+        </PackageSection>
       </div>
 
       <Link
@@ -304,6 +363,51 @@ export function ResultView() {
       </Link>
     </div>
   );
+}
+
+function ClipCard({ clip }: { clip: VideoAssemblyClip }) {
+  return (
+    <li className="rounded-xl border border-slate-200 bg-slate-50 p-4 sm:p-5">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div className="min-w-0">
+          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+            Clip {clip.clipNumber}
+          </p>
+        </div>
+        <div className="w-full shrink-0 sm:w-auto">
+          <CopyButton
+            text={formatClipCopy(clip)}
+            source={`Video Assembly Clip ${clip.clipNumber}`}
+            compact
+          />
+        </div>
+      </div>
+      <dl className="mt-4 space-y-3">
+        <SceneField label="Source Scene" value={displayValue(clip.sourceScene)} />
+        <SceneField label="Duration" value={displayValue(clip.duration)} />
+        <SceneField label="Purpose" value={displayValue(clip.purpose)} />
+        <SceneField
+          label="Editing Instruction"
+          value={displayValue(clip.editingInstruction)}
+          emphasis
+        />
+      </dl>
+    </li>
+  );
+}
+
+function formatClipCopy(clip: VideoAssemblyClip): string {
+  return [
+    `Clip ${clip.clipNumber}`,
+    `Source Scene: ${displayValue(clip.sourceScene)}`,
+    `Duration: ${displayValue(clip.duration)}`,
+    `Purpose: ${displayValue(clip.purpose)}`,
+    `Editing Instruction: ${displayValue(clip.editingInstruction)}`,
+  ].join("\n");
+}
+
+function formatTransitionCopy(transition: VideoAssemblyTransition): string {
+  return `${transition.from} → ${transition.to}: ${transition.instruction}`;
 }
 
 function SceneCard({ scene }: { scene: RecordingScene }) {
@@ -535,7 +639,7 @@ function PackageSection({
               featured ? "mt-1 text-lg sm:text-xl" : "text-sm sm:text-base"
             }`}
           >
-            <span className="mr-2 text-slate-400">{number}</span>
+            {number ? <span className="mr-2 text-slate-400">{number}</span> : null}
             {title}
           </h2>
           <p className="mt-1 text-sm leading-6 text-slate-500">{description}</p>

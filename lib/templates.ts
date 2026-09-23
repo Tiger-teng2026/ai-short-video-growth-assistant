@@ -1,5 +1,6 @@
 import {
   getRecordingSceneBudget,
+  getVideoAssemblyClipBudget,
   type GenerateInput,
 } from "@/lib/content-package";
 import { getGoal } from "@/lib/goals";
@@ -36,6 +37,24 @@ const jsonExample = `{
     "opening": "first spoken sentence, matches scene 1 audio",
     "body": "spoken lines for the middle scenes, in scene order",
     "cta": "the single closing CTA"
+  },
+  "videoAssembly": {
+    "clipOrder": [
+      {
+        "clipNumber": 1,
+        "sourceScene": "Scene 1",
+        "duration": "0-3s",
+        "purpose": "open the video on the first problem picture",
+        "editingInstruction": "Keep the first spoken sentence. Cut extra frames before the hook."
+      }
+    ],
+    "transitions": [
+      {
+        "from": "Scene 1",
+        "to": "Scene 2",
+        "instruction": "Switch to screen recording after explaining the problem."
+      }
+    ]
   },
   "editingGuide": {
     "pacing": "how fast to cut",
@@ -150,15 +169,17 @@ export function buildTemplatePrompt(
 ): { systemPrompt: string; userPrompt: string } {
   const platformRules = getPlatformRules(input.platform);
   const sceneBudget = getRecordingSceneBudget(input.videoLength);
+  const clipBudget = getVideoAssemblyClipBudget(input.videoLength);
 
-  const systemPrompt = `You are a short-video production planner for SaaS founders who have no marketing team and will film on a phone.
+  const systemPrompt = `You are an AI short video production assistant helping SaaS founders create complete short videos.
 
 Context:
-The user typed a product description. Return a production blueprint they can shoot tomorrow — not a ChatGPT ad script.
+The user typed a product description. They will film the footage themselves. Return a production blueprint that helps them finish Idea → Recording → Assembly → Publishing — not a ChatGPT ad script.
 
 Your job:
-Create a ready-to-film production blueprint for TikTok, YouTube Shorts, or Instagram Reels.
-Write for a founder filming alone. Every line must tell them what to point the camera at, what to do, what to say, and what text to put on screen.
+Create a ready-to-film and ready-to-assemble production blueprint for TikTok, YouTube Shorts, or Instagram Reels.
+Write for a founder filming alone. Every line must tell them what to point the camera at, what to do, what to say, what text to put on screen, and how to put the clips together after filming.
+Do not output professional editing lessons. Do not use complex video jargon.
 
 Anti-fabrication rules:
 - Do not invent user counts, customer results, product metrics, or UI button names.
@@ -189,6 +210,17 @@ SaaS demo rules:
 - Describe the flow by user actions and results on screen, never by guessed button labels.
 - State which scene the product first appears in.
 
+Video Assembly rules:
+- You MUST include videoAssembly.
+- Clip count for this video: ${clipBudget.label}.
+- 15 seconds = 2-3 clips. 30 seconds = 3-4 clips. 60 seconds = 4-6 clips.
+- Do not go outside that range.
+- Each clip must name: the source Scene, the position in the finished video, what to keep, and what to delete.
+- editingInstruction must say what to keep and what to delete in plain language.
+- Transitions: one simple sentence only.
+- Example: "Switch to screen recording after explaining the problem."
+- Forbidden: "Add cinematic transition", "Use advanced effects", or any complex editing jargon.
+
 CTA rules:
 - One CTA only. It must match the video goal.
 - publishingPackage.ctaOptions must contain exactly that one CTA.
@@ -196,7 +228,7 @@ CTA rules:
 - Do not offer a second CTA.
 
 Quality rules:
-- Include all six sections: Video Strategy, Recording Guide, Voice Script, Editing Guide, Publishing Package, Production Checklist.
+- Include all seven sections: Video Strategy, Recording Guide, Video Assembly, Voice Script, Editing Guide, Publishing Package, Production Checklist.
 - Voiceover is per scene, not one long paragraph.
 - Editing Guide must be doable in CapCut or iPhone edit.
 - Stay native to ${input.platform}.
@@ -207,6 +239,8 @@ Output rules:
 - Use this json shape exactly:
 ${jsonExample}
 - recordingGuide: ${sceneBudget.label}. Scene 1 is 0-3s.
+- videoAssembly.clipOrder: ${clipBudget.label}. Each clip maps to a recordingGuide scene.
+- videoAssembly.transitions: one simple sentence between consecutive clips.
 - hooks: exactly 3 distinct spoken hooks. Do not repeat the same sentence.
 - script: copy voiceScript.
 - shotList: one line per scene.
@@ -226,6 +260,9 @@ ${input.videoLength}
 Required scene count:
 ${sceneBudget.label}
 
+Required clip count:
+${clipBudget.label}
+
 Platform rules:
 ${platformRules}
 
@@ -238,6 +275,7 @@ ${input.goal}
 Use only facts in the product description. If founder background or a real customer case is missing, follow the template fallback. Do not fabricate experience, metrics, or UI labels.
 Scene 1 must be 0-3s with a first-second picture and a first spoken sentence.
 Give an executable product walkthrough when the product is shown.
+Include videoAssembly so the founder can put recorded clips together after filming.
 Use one CTA from the video goal. Never write Try it free or Link in bio.
 
 Return json only.`;
@@ -253,7 +291,7 @@ function getGoalContext(goalRef: string): string {
 
   return `Video Goal Context:
 ${goal.prompt}
-Adjust Video Strategy, Recording Guide, Voice Script, Editing Guide, Publishing Package, and Production Checklist so they serve this goal.`;
+Adjust Video Strategy, Recording Guide, Video Assembly, Voice Script, Editing Guide, Publishing Package, and Production Checklist so they serve this goal.`;
 }
 
 function getPlatformRules(platform: string): string {
