@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 import { ResultView } from "@/components/ResultView";
 
 export const metadata: Metadata = {
-  title: "Short Video Production Plan",
-  description: "A ready-to-record content workflow for your SaaS product.",
+  title: "Production Blueprint",
+  description:
+    "A scene-by-scene short-video production workspace for your SaaS product.",
   robots: {
     index: false,
     follow: false,

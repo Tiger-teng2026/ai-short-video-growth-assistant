@@ -140,7 +140,9 @@ export async function POST(request: Request) {
     }
 
     const message =
-      error instanceof Error ? error.message : "Failed to generate content package.";
+      error instanceof Error
+        ? error.message
+        : "Failed to generate production blueprint.";
 
     return Response.json({ error: message }, { status: 502 });
   }
