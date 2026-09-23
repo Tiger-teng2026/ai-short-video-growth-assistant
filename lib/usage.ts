@@ -1,6 +1,9 @@
 export const FREE_DAILY_LIMIT = 3;
 export const USAGE_STORAGE_KEY = "growth-assistant-free-usage";
 
+// MVP testing: keep payment/Upgrade code, but do not block generation.
+const FREE_LIMIT_ENFORCED = false;
+
 export type FreeUsage = {
   generationDate: string;
   generationCount: number;
@@ -25,6 +28,10 @@ export function resolveUsage(
 }
 
 export function isAtFreeLimit(usage: FreeUsage): boolean {
+  if (!FREE_LIMIT_ENFORCED) {
+    return false;
+  }
+
   return usage.generationCount >= FREE_DAILY_LIMIT;
 }
 
