@@ -85,7 +85,14 @@ function sendToGa4(event: AnalyticsEvent, params: Record<string, string>): void 
       window.dataLayer.push(arguments);
     };
 
-  window.gtag("event", event, params);
+  const debugMode =
+    new URLSearchParams(window.location.search).get("debug_mode") === "true";
+
+  window.gtag("event", event, {
+    ...params,
+    send_to: measurementId,
+    ...(debugMode ? { debug_mode: true } : {}),
+  });
 }
 
 declare global {

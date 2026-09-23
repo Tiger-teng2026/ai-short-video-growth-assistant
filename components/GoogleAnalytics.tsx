@@ -22,7 +22,10 @@ export function GoogleAnalytics() {
           function gtag(){dataLayer.push(arguments);}
           window.gtag = gtag;
           gtag('js', new Date());
-          gtag('config', '${measurementId}', { anonymize_ip: true });
+          gtag('config', '${measurementId}', {
+            anonymize_ip: true,
+            debug_mode: /(?:^|[?&])debug_mode=true(?:&|$)/.test(location.search)
+          });
         `}
       </Script>
     </>
