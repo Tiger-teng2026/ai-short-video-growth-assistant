@@ -12,13 +12,17 @@
   --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
-html {
+html,
+body {
   text-autospace: no-autospace;
+  text-spacing-trim: space-all;
+  font-kerning: none;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, ui-sans-serif, system-ui, sans-serif;
-  word-spacing: normal;
+  word-spacing: 0.16em;
+  letter-spacing: 0.01em;
 }

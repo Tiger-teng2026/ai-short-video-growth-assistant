@@ -77,5 +77,5 @@ function toCheckoutError(message: string | undefined, status: number) {
     return message;
   }
 
-  return "Unable to start checkout. Please try again later.";
+  return "Checkout is unavailable right now. Please try again later.";
 }

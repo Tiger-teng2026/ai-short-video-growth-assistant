@@ -1,7 +1,8 @@
 import { isPaidPlan, type PaidPlan } from "@/lib/plans";
 
 const CREEM_API_URL =
-  process.env.CREEM_API_URL?.replace(/\/$/, "") || "https://test-api.creem.io";
+  readServerEnv("CREEM_API_URL")?.replace(/\/$/, "") ||
+  "https://test-api.creem.io";
 
 export class CreemError extends Error {
   status: number;
@@ -21,7 +22,7 @@ export async function createCreemCheckout(params: {
     throw new CreemError("Plan must be creator or pro.", 400);
   }
 
-  const apiKey = process.env.CREEM_API_KEY?.trim();
+  const apiKey = readServerEnv("CREEM_API_KEY");
   if (!apiKey) {
     throw new CreemError(
       "CREEM_API_KEY is missing. Add it to .env.local and restart the server.",
@@ -78,7 +79,21 @@ export async function createCreemCheckout(params: {
 
 function getProductId(plan: PaidPlan): string | undefined {
   if (plan === "creator") {
-    return process.env.CREEM_PRODUCT_ID_CREATOR?.trim();
+    return readServerEnv("CREEM_PRODUCT_ID_CREATOR");
   }
-  return process.env.CREEM_PRODUCT_ID_PRO?.trim();
+  return readServerEnv("CREEM_PRODUCT_ID_PRO");
+}
+
+function readServerEnv(name: string): string | undefined {
+  const value = process.env[name];
+  if (typeof value !== "string") {
+    return undefined;
+  }
+
+  const trimmed = value.trim();
+  if (!trimmed || trimmed === "[SENSITIVE]") {
+    return undefined;
+  }
+
+  return trimmed;
 }

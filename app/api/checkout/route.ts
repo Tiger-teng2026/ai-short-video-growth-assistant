@@ -1,6 +1,8 @@
 import { createCreemCheckout, CreemError } from "@/lib/creem";
 
 export const maxDuration = 30;
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 
 export async function POST(request: Request) {
   let plan = "";
