@@ -1,7 +1,7 @@
-export const SITE_NAME = "Growth Assistant";
-export const SITE_TAGLINE = "AI SaaS Founder Content Workflow Assistant";
+export const SITE_NAME = "Production Assistant";
+export const SITE_TAGLINE = "AI Short Video Production Assistant";
 export const SITE_DESCRIPTION =
-  "Turn your product ideas into ready-to-film TikTok, YouTube Shorts, and Reels content packages.";
+  "Help SaaS founders and product creators turn a product idea into a professional short-video production blueprint.";
 
 export function getSiteUrl(): string {
   const fromEnv = process.env.APP_URL?.trim().replace(/\/$/, "");

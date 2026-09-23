@@ -4,7 +4,7 @@ import { ResultView } from "@/components/ResultView";
 export const metadata: Metadata = {
   title: "Production Blueprint",
   description:
-    "A scene-by-scene short-video production workspace for your SaaS product.",
+    "Your video production blueprint: Recording Guide, Video Strategy, Voice Script, Editing Guide, and Publishing Package.",
   robots: {
     index: false,
     follow: false,

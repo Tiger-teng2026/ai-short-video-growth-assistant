@@ -68,13 +68,13 @@ export function ResultView() {
         <p className="mt-3 text-slate-600 leading-7">
           {invalid
             ? "This production blueprint could not be loaded. The saved data is missing or invalid."
-            : "Generate a product idea to get a scene-by-scene filming plan."}
+            : "Enter a product idea to get a scene-by-scene filming plan."}
         </p>
         <Link
           href="/generate"
           className="mt-8 inline-flex h-12 items-center rounded-lg bg-slate-900 px-5 text-sm font-medium text-white transition-colors hover:bg-slate-800"
         >
-          {invalid ? "Back to Generate" : "Create a production blueprint"}
+          {invalid ? "Back to Create" : "Create a production blueprint"}
         </Link>
       </div>
     );
@@ -131,23 +131,37 @@ export function ResultView() {
         Production Blueprint Workspace
       </p>
       <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">
-        Film this short from one product idea
+        Start with the Recording Guide
       </h1>
       <p className="mt-3 max-w-2xl text-slate-600 leading-7">
-        Strategy, scene-by-scene recording, voice, edit notes, and a publish pack
-        for {pack.platform}.
+        Each scene tells you the duration, where to point the camera, what to
+        film, your action, and what happens on screen for {pack.platform}.
       </p>
 
       <dl className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
         <MetaItem label="Platform" value={pack.platform} />
         <MetaItem label="Video Goal" value={videoGoal} />
-        <MetaItem label="Content Template" value={contentTemplate} />
+        <MetaItem label="Video Format" value={contentTemplate} />
         <MetaItem label="Video Length" value={pack.videoLength} />
       </dl>
 
       <div className="mt-10 space-y-5 sm:space-y-6">
         <PackageSection
           number="01"
+          title="Recording Guide"
+          description="Highest priority. Shoot each scene in order. Camera, action, and screen are written so you can film on a phone."
+          copyText={recordingText}
+          featured
+        >
+          <ol className="space-y-5">
+            {scenes.map((scene, index) => (
+              <SceneCard key={`scene-${scene.scene}-${index}`} scene={scene} />
+            ))}
+          </ol>
+        </PackageSection>
+
+        <PackageSection
+          number="02"
           title="Video Strategy"
           description="What this video is for, who it talks to, and how it should open."
           copyText={strategyText}
@@ -181,20 +195,6 @@ export function ResultView() {
               ))}
             </ol>
           ) : null}
-        </PackageSection>
-
-        <PackageSection
-          number="02"
-          title="Recording Guide"
-          description="The core filming workspace. Shoot each scene in order on a phone."
-          copyText={recordingText}
-          featured
-        >
-          <ol className="space-y-4">
-            {scenes.map((scene, index) => (
-              <SceneCard key={`scene-${scene.scene}-${index}`} scene={scene} />
-            ))}
-          </ol>
         </PackageSection>
 
         <PackageSection
@@ -307,54 +307,104 @@ export function ResultView() {
 }
 
 function SceneCard({ scene }: { scene: RecordingScene }) {
-  const screenFrame = [scene.shotType, scene.visual].filter(Boolean).join(" · ");
+  const fields = sceneFields(scene);
 
   return (
     <li className="rounded-xl border border-slate-200 bg-slate-50 p-4 sm:p-5">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-        <div>
+        <div className="min-w-0">
           <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
             Scene {scene.scene}
           </p>
-          <p className="mt-1 text-base font-semibold text-slate-900">
-            {displayValue(scene.shotType)} · {displayValue(scene.duration)}
-          </p>
+          <div className="mt-2 flex flex-wrap gap-2">
+            <SceneChip label={displayValue(scene.duration)} />
+            <SceneChip label={displayValue(scene.shotType)} />
+          </div>
         </div>
-        <CopyButton
-          text={formatSceneCopy(scene)}
-          source={`Recording Scene ${scene.scene}`}
-          compact
-        />
+        <div className="w-full shrink-0 sm:w-auto">
+          <CopyButton
+            text={formatSceneCopy(scene)}
+            source={`Recording Scene ${scene.scene}`}
+            compact
+          />
+        </div>
       </div>
-      <dl className="mt-4 grid gap-3 sm:grid-cols-2">
-        <Fact label="Time" value={displayValue(scene.duration)} />
-        <Fact label="Shot type" value={displayValue(scene.shotType)} />
-        <Fact label="What to film" value={displayValue(scene.visual)} />
-        <Fact label="Founder action" value={displayValue(scene.action)} />
-        <Fact label="On-camera frame" value={displayValue(screenFrame)} />
-        <Fact label="Voiceover" value={displayValue(scene.audio)} />
-        <Fact
-          label="On-screen text"
-          value={displayValue(scene.onScreenText)}
-          className="sm:col-span-2"
-        />
+      <dl className="mt-4 space-y-3">
+        {fields.map((field) => (
+          <SceneField
+            key={field.label}
+            label={field.label}
+            value={field.value}
+            emphasis={field.emphasis}
+          />
+        ))}
       </dl>
     </li>
   );
 }
 
-function formatSceneCopy(scene: RecordingScene): string {
-  const screenFrame = [scene.shotType, scene.visual].filter(Boolean).join(" · ");
+function sceneFields(scene: RecordingScene): {
+  label: string;
+  value: string;
+  emphasis?: boolean;
+}[] {
+  return [
+    { label: "Duration", value: displayValue(scene.duration) },
+    { label: "Shot Type", value: displayValue(scene.shotType) },
+    {
+      label: "Camera Guidance",
+      value: displayValue(scene.cameraGuidance ?? ""),
+      emphasis: true,
+    },
+    { label: "What To Film", value: displayValue(scene.visual) },
+    { label: "User Action", value: displayValue(scene.action) },
+    {
+      label: "Screen Action",
+      value: displayValue(scene.screenAction ?? ""),
+      emphasis: true,
+    },
+    { label: "Voiceover", value: displayValue(scene.audio) },
+    { label: "On-screen Text", value: displayValue(scene.onScreenText) },
+  ];
+}
 
+function SceneField({
+  label,
+  value,
+  emphasis = false,
+}: {
+  label: string;
+  value: string;
+  emphasis?: boolean;
+}) {
+  return (
+    <div
+      className={`rounded-lg px-3 py-3 ${
+        emphasis ? "border border-slate-200 bg-white" : "bg-transparent"
+      }`}
+    >
+      <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+        {label}
+      </dt>
+      <dd className="mt-1 break-words text-[15px] leading-7 text-slate-900">
+        {value}
+      </dd>
+    </div>
+  );
+}
+
+function SceneChip({ label }: { label: string }) {
+  return (
+    <span className="inline-flex min-h-8 items-center rounded-full border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-800">
+      {label}
+    </span>
+  );
+}
+
+function formatSceneCopy(scene: RecordingScene): string {
   return [
     `Scene ${scene.scene}`,
-    `Time: ${displayValue(scene.duration)}`,
-    `Shot type: ${displayValue(scene.shotType)}`,
-    `What to film: ${displayValue(scene.visual)}`,
-    `Founder action: ${displayValue(scene.action)}`,
-    `On-camera frame: ${displayValue(screenFrame)}`,
-    `Voiceover: ${displayValue(scene.audio)}`,
-    `On-screen text: ${displayValue(scene.onScreenText)}`,
+    ...sceneFields(scene).map((field) => `${field.label}: ${field.value}`),
   ].join("\n");
 }
 
@@ -363,10 +413,12 @@ function fallbackScene(shot: string, index: number): RecordingScene {
     scene: index + 1,
     duration: "",
     shotType: "phone",
+    cameraGuidance: "",
     visual: shot,
+    action: shot,
+    screenAction: "",
     onScreenText: "",
     audio: "",
-    action: shot,
   };
 }
 
@@ -465,15 +517,24 @@ function PackageSection({
 }) {
   return (
     <section
-      className={`rounded-xl border bg-white p-4 sm:p-5 ${
+      className={`rounded-xl border bg-white ${
         featured
-          ? "border-slate-900 shadow-sm"
-          : "border-slate-200"
+          ? "border-slate-900 p-5 shadow-sm sm:p-6"
+          : "border-slate-200 p-4 sm:p-5"
       }`}
     >
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0">
-          <h2 className="text-sm font-semibold text-slate-900 sm:text-base">
+          {featured ? (
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-900">
+              Start here
+            </p>
+          ) : null}
+          <h2
+            className={`font-semibold text-slate-900 ${
+              featured ? "mt-1 text-lg sm:text-xl" : "text-sm sm:text-base"
+            }`}
+          >
             <span className="mr-2 text-slate-400">{number}</span>
             {title}
           </h2>

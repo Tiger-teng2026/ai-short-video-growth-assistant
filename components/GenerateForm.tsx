@@ -18,9 +18,9 @@ const videoLengths = ["15 seconds", "30 seconds", "60 seconds"] as const;
 
 const generationSteps = [
   "Analyzing your SaaS product...",
-  "Creating video strategy...",
-  "Writing script and recording plan...",
-  "Preparing your production plan...",
+  "Building Video Strategy...",
+  "Writing Recording Guide and Voice Script...",
+  "Preparing Editing Guide and Publishing Package...",
 ];
 
 type Platform = (typeof platforms)[number];
@@ -78,7 +78,7 @@ export function GenerateForm() {
     }
 
     if (!selectedTemplate) {
-      setError("Select a content template.");
+      setError("Select a template.");
       return;
     }
 
@@ -148,6 +148,9 @@ export function GenerateForm() {
       <section>
         <p className="text-sm font-medium text-slate-500">Step 1</p>
         <h2 className="mt-1 text-lg font-semibold text-slate-900">Platform</h2>
+        <p className="mt-1 text-sm leading-6 text-slate-500">
+          Where this production blueprint will be published.
+        </p>
         <div className="mt-4 grid gap-3 sm:grid-cols-3">
           {platforms.map((option) => {
             const selected = platform === option;
@@ -178,6 +181,10 @@ export function GenerateForm() {
         >
           Product Description
         </label>
+        <p className="mt-1 text-sm leading-6 text-slate-500">
+          Describe the SaaS product you will film. The blueprint uses only facts
+          from this description.
+        </p>
         <textarea
           id="product-description"
           name="productDescription"
@@ -192,7 +199,10 @@ export function GenerateForm() {
 
       <section>
         <p className="text-sm font-medium text-slate-500">Step 3</p>
-        <h2 className="mt-1 text-lg font-semibold text-slate-900">Video Goal</h2>
+        <h2 className="mt-1 text-lg font-semibold text-slate-900">Goal</h2>
+        <p className="mt-1 text-sm leading-6 text-slate-500">
+          One goal. The Recording Guide and CTA follow this choice.
+        </p>
         <div className="mt-4 space-y-3">
           {goals.map((option) => {
             const selected = goalId === option.id;
@@ -224,9 +234,11 @@ export function GenerateForm() {
 
       <section>
         <p className="text-sm font-medium text-slate-500">Step 4</p>
-        <h2 className="mt-1 text-lg font-semibold text-slate-900">
-          Content Template
-        </h2>
+        <h2 className="mt-1 text-lg font-semibold text-slate-900">Template</h2>
+        <p className="mt-1 text-sm leading-6 text-slate-500">
+          Choose the video structure. Every template still returns the full
+          production blueprint.
+        </p>
         <div className="mt-4 space-y-3">
           {templates.map((option) => {
             const selected = templateId === option.id;
@@ -261,6 +273,9 @@ export function GenerateForm() {
         <h2 className="mt-1 text-lg font-semibold text-slate-900">
           Video Length
         </h2>
+        <p className="mt-1 text-sm leading-6 text-slate-500">
+          Sets how many scenes the Recording Guide should include.
+        </p>
         <div className="mt-4 grid gap-3 sm:grid-cols-3">
           {videoLengths.map((option) => {
             const selected = videoLength === option;
@@ -304,8 +319,8 @@ export function GenerateForm() {
               className="inline-flex min-h-12 items-center rounded-lg bg-slate-900 px-5 text-sm font-medium text-white transition-colors hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isGenerating
-                ? "Generating Your Video Plan..."
-                : "Generate Content Package"}
+                ? "Creating Your Production Blueprint..."
+                : "Create Production Blueprint"}
             </button>
             {isGenerating ? (
               <ol className="mt-6 space-y-3" aria-live="polite">

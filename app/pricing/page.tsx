@@ -6,7 +6,8 @@ import { plans } from "@/lib/plans";
 
 export const metadata: Metadata = {
   title: "Pricing",
-  description: "Simple pricing for SaaS founders who need a short-video content workflow.",
+  description:
+    "Simple pricing for SaaS founders who need a video production workflow.",
 };
 
 export default function PricingPage() {
@@ -20,8 +21,8 @@ export default function PricingPage() {
         Start free. Upgrade when you publish more.
       </h1>
       <p className="mt-3 max-w-2xl text-slate-600 leading-7">
-        Get a ready-to-film content package from one product idea. No marketing
-        team required.
+        Get a ready-to-film production blueprint from one product idea. No
+        marketing team required.
       </p>
 
       <div className="mt-12 grid gap-6 lg:grid-cols-3">

@@ -2,21 +2,28 @@ import type { Metadata } from "next";
 import { GenerateForm } from "@/components/GenerateForm";
 
 export const metadata: Metadata = {
-  title: "Generate",
+  title: "Create Your Video Production Blueprint",
   description:
-    "Create a ready-to-film TikTok, YouTube Shorts, or Reels content package from one SaaS product idea.",
+    "Enter a SaaS product and generate a Video Strategy, Recording Guide, Voice Script, Editing Guide, and Publishing Package.",
 };
 
 export default function GeneratePage() {
   return (
     <div className="mx-auto max-w-2xl px-6 py-16">
       <h1 className="text-3xl font-semibold tracking-tight text-slate-900">
-        Generate a content package
+        Create Your Video Production Blueprint
       </h1>
       <p className="mt-3 text-slate-600 leading-7">
-        Choose a platform, set a video goal, pick a template, and turn a product
-        idea into a ready-to-film short video package.
+        Enter your SaaS product, pick a goal and template, and get a filming
+        plan you can shoot on a phone.
       </p>
+      <ul className="mt-5 space-y-2 text-sm leading-6 text-slate-600">
+        <li>Video Strategy</li>
+        <li>Recording Guide</li>
+        <li>Voice Script</li>
+        <li>Editing Guide</li>
+        <li>Publishing Package</li>
+      </ul>
       <div className="mt-10">
         <GenerateForm />
       </div>

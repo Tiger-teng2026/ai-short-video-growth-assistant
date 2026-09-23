@@ -9,69 +9,85 @@ import {
 
 const heroValues = [
   {
-    title: "Viral Hooks",
-    body: "Open with lines built to stop the scroll in the first three seconds.",
+    title: "Video Strategy",
+    body: "Concept, viewer, hook, promise, and one CTA before you film.",
   },
   {
-    title: "Ready-to-record Scripts",
-    body: "Get a spoken opening, body, and CTA you can film on a phone.",
+    title: "Recording Guide",
+    body: "Scene-by-scene shots, timing, and founder actions you can film on a phone.",
   },
   {
-    title: "Creator Workflow",
-    body: "Move from product idea to a publish-ready short-video plan.",
+    title: "Voice Script",
+    body: "Spoken opening, body, and CTA that match each scene.",
+  },
+  {
+    title: "Editing Guide",
+    body: "Cuts, overlays, captions, and pacing so the cut is obvious.",
+  },
+  {
+    title: "Publishing Package",
+    body: "Caption, hashtags, thumbnail line, and first comment ready to post.",
   },
 ];
 
 const problems = [
-  "No content ideas",
-  "No marketing team",
-  "No time for scripts",
+  "Don't know what to film first",
+  "No scene-by-scene recording plan",
+  "Scripts that don't match a real product demo",
 ];
 
 const workflow = [
   {
     step: "1",
-    title: "Product Idea",
-    body: "Start with the SaaS product you already have.",
+    title: "Video Strategy",
+    body: "Decide who the video is for and what it must prove.",
   },
   {
     step: "2",
-    title: "Content Strategy",
-    body: "Pick a founder workflow: demo, story, tip, or proof.",
+    title: "Recording Guide",
+    body: "Film each scene with a clear shot, action, and on-screen frame.",
   },
   {
     step: "3",
-    title: "Video Script",
-    body: "Get a hook, spoken script, caption, and CTA.",
+    title: "Voice Script",
+    body: "Say one line per scene. No extra marketing copy.",
   },
   {
     step: "4",
-    title: "Recording Plan",
-    body: "Follow a shot list you can film on a phone.",
+    title: "Editing Guide",
+    body: "Cut, overlay, and caption from a shot list you already filmed.",
   },
   {
     step: "5",
-    title: "Publish",
-    body: "Post to TikTok, YouTube Shorts, or Reels.",
+    title: "Publishing Package",
+    body: "Post to TikTok, YouTube Shorts, or Reels with one CTA.",
   },
 ];
 
 const exampleCase = {
   product: "AI invoice tool for freelancers",
-  hook: "You just finished a $2,000 project. Then invoicing stole the next 40 minutes.",
-  script: {
-    opening: "You closed the work. Then you spent longer making the invoice.",
-    body: "Wrong rate. Missing hours. Late send. Describe the work instead. The invoice drafts in seconds. You review, send, and get paid.",
-    cta: "Try it free — link in bio.",
+  strategy: {
+    concept: "Show how invoicing steals time after the real work is done.",
+    viewer: "Freelancers who still build invoices by hand.",
+    hook: "You just finished a $2,000 project. Then invoicing stole the next 40 minutes.",
+    promise: "Describe the work once. Review and send the invoice.",
+    cta: "Comment DEMO if you want the recording walkthrough.",
   },
-  shotList: [
-    "Face cam, direct to lens: “40 minutes for one invoice?”",
-    "Cut to a messy spreadsheet and unpaid invoice notes.",
-    "Screen recording: type the project details, watch the invoice draft.",
-    "Face cam plus product overlay: send, then hold on the CTA.",
+  recordingGuide: [
+    "0–3s · Face cam: “40 minutes for one invoice?”",
+    "Screen: messy spreadsheet and unpaid invoice notes.",
+    "Screen recording: describe the project, watch the invoice draft.",
+    "Face cam plus product overlay: review, send, hold on the CTA.",
   ],
-  caption:
-    "If invoicing takes longer than the work, the process is broken. Describe the project, send the invoice, and get paid faster.",
+  voiceScript: {
+    opening: "You closed the work. Then you spent longer making the invoice.",
+    body: "Wrong rate. Missing hours. Late send. Describe the work instead. The invoice drafts in seconds. You review and send.",
+    cta: "Comment DEMO if you want the walkthrough.",
+  },
+  editingGuide:
+    "Cut on the pain line. Hold the messy spreadsheet for one beat. Speed the draft. End on one CTA card.",
+  publishingPackage:
+    "Caption the time cost, not the feature list. Hashtags stay product-specific. First comment repeats: Comment DEMO.",
 };
 
 export default function Home() {
@@ -102,25 +118,26 @@ export default function Home() {
       />
       <section className="flex flex-col items-start py-20 sm:py-28">
         <p className="text-sm font-medium uppercase tracking-wide text-slate-500">
-          AI SaaS Founder Content Workflow Assistant
+          {SITE_TAGLINE}
         </p>
         <h1 className="mt-3 max-w-3xl text-4xl font-semibold tracking-tight text-slate-900 sm:text-5xl sm:leading-tight">
-          Create SaaS Growth Content Without a Marketing Team
+          Turn a product idea into a short-video production blueprint
         </h1>
         <p className="mt-5 max-w-2xl text-lg leading-8 text-slate-600">
-          Turn your SaaS idea into a complete short-video package: hooks,
-          scripts, shots, captions, and CTAs.
+          Help SaaS founders and product creators turn a product idea into a
+          professional short-video production blueprint: Video Strategy,
+          Recording Guide, Voice Script, Editing Guide, and Publishing Package.
         </p>
         <Link
           href="/generate"
           className="mt-8 inline-flex h-12 items-center rounded-lg bg-slate-900 px-6 text-sm font-medium text-white transition-colors hover:bg-slate-800"
         >
-          Create My First Video Plan
+          Create My Production Blueprint
         </Link>
       </section>
 
       <section className="pb-16">
-        <div className="grid gap-4 sm:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
           {heroValues.map((item) => (
             <article
               key={item.title}
@@ -140,7 +157,7 @@ export default function Home() {
           Problem
         </p>
         <h2 className="mt-2 text-2xl font-semibold tracking-tight text-slate-900">
-          Most SaaS founders get stuck before they film.
+          Most founders get stuck before they press record.
         </h2>
         <ul className="mt-6 space-y-3">
           {problems.map((item) => (
@@ -157,7 +174,7 @@ export default function Home() {
           Workflow
         </p>
         <h2 className="mt-2 text-2xl font-semibold tracking-tight text-slate-900">
-          From product idea to a video you can publish.
+          From product idea to a blueprint you can film, edit, and publish.
         </h2>
         <ol className="mt-8 grid gap-4 sm:grid-cols-5">
           {workflow.map((item, index) => (
@@ -187,11 +204,11 @@ export default function Home() {
           Solution
         </p>
         <h2 className="mt-2 text-2xl font-semibold tracking-tight text-slate-900">
-          One product idea. A complete short-video workflow.
+          One product idea. A complete production blueprint.
         </h2>
         <p className="mt-4 max-w-2xl text-slate-600 leading-7">
-          Product Idea → Content Strategy → Video Script → Recording Plan →
-          Publish. No marketing team required.
+          Video Strategy → Recording Guide → Voice Script → Editing Guide →
+          Publishing Package. No marketing team required.
         </p>
       </section>
 
@@ -200,7 +217,7 @@ export default function Home() {
           Example
         </p>
         <h2 className="mt-2 text-2xl font-semibold tracking-tight text-slate-900">
-          A full content package from one product idea.
+          A full production blueprint from one product idea.
         </h2>
         <p className="mt-3 text-sm text-slate-500">
           Product: {exampleCase.product}
@@ -208,37 +225,42 @@ export default function Home() {
 
         <div className="mt-8 space-y-4">
           <article className="rounded-xl border border-slate-200 bg-white p-5">
-            <h3 className="text-sm font-semibold text-slate-900">Hook</h3>
-            <p className="mt-2 text-sm leading-7 text-slate-700">
-              {exampleCase.hook}
-            </p>
-          </article>
-
-          <article className="rounded-xl border border-slate-200 bg-white p-5">
-            <h3 className="text-sm font-semibold text-slate-900">Script</h3>
+            <h3 className="text-sm font-semibold text-slate-900">
+              Video Strategy
+            </h3>
             <div className="mt-3 space-y-3 text-sm leading-7 text-slate-700">
               <p>
-                <span className="font-semibold text-slate-900">Opening. </span>
-                {exampleCase.script.opening}
+                <span className="font-semibold text-slate-900">Concept. </span>
+                {exampleCase.strategy.concept}
               </p>
               <p>
-                <span className="font-semibold text-slate-900">Body. </span>
-                {exampleCase.script.body}
+                <span className="font-semibold text-slate-900">Viewer. </span>
+                {exampleCase.strategy.viewer}
+              </p>
+              <p>
+                <span className="font-semibold text-slate-900">Hook. </span>
+                {exampleCase.strategy.hook}
+              </p>
+              <p>
+                <span className="font-semibold text-slate-900">Promise. </span>
+                {exampleCase.strategy.promise}
               </p>
               <p>
                 <span className="font-semibold text-slate-900">CTA. </span>
-                {exampleCase.script.cta}
+                {exampleCase.strategy.cta}
               </p>
             </div>
           </article>
 
           <article className="rounded-xl border border-slate-200 bg-white p-5">
-            <h3 className="text-sm font-semibold text-slate-900">Shot List</h3>
+            <h3 className="text-sm font-semibold text-slate-900">
+              Recording Guide
+            </h3>
             <ol className="mt-3 space-y-2">
-              {exampleCase.shotList.map((shot, index) => (
+              {exampleCase.recordingGuide.map((shot, index) => (
                 <li key={shot} className="text-sm leading-6 text-slate-700">
                   <span className="font-semibold text-slate-900">
-                    Shot {index + 1}.
+                    Scene {index + 1}.
                   </span>{" "}
                   {shot}
                 </li>
@@ -247,9 +269,38 @@ export default function Home() {
           </article>
 
           <article className="rounded-xl border border-slate-200 bg-white p-5">
-            <h3 className="text-sm font-semibold text-slate-900">Caption</h3>
+            <h3 className="text-sm font-semibold text-slate-900">Voice Script</h3>
+            <div className="mt-3 space-y-3 text-sm leading-7 text-slate-700">
+              <p>
+                <span className="font-semibold text-slate-900">Opening. </span>
+                {exampleCase.voiceScript.opening}
+              </p>
+              <p>
+                <span className="font-semibold text-slate-900">Body. </span>
+                {exampleCase.voiceScript.body}
+              </p>
+              <p>
+                <span className="font-semibold text-slate-900">CTA. </span>
+                {exampleCase.voiceScript.cta}
+              </p>
+            </div>
+          </article>
+
+          <article className="rounded-xl border border-slate-200 bg-white p-5">
+            <h3 className="text-sm font-semibold text-slate-900">
+              Editing Guide
+            </h3>
             <p className="mt-2 text-sm leading-7 text-slate-700">
-              {exampleCase.caption}
+              {exampleCase.editingGuide}
+            </p>
+          </article>
+
+          <article className="rounded-xl border border-slate-200 bg-white p-5">
+            <h3 className="text-sm font-semibold text-slate-900">
+              Publishing Package
+            </h3>
+            <p className="mt-2 text-sm leading-7 text-slate-700">
+              {exampleCase.publishingPackage}
             </p>
           </article>
         </div>

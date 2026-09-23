@@ -12,11 +12,11 @@ export const plans = [
     name: "Free",
     price: "$0",
     period: "",
-    description: "Try the founder content workflow.",
+    description: "Try the founder video production workflow.",
     features: [
-      "3 content packages per day",
-      "All 5 founder templates",
-      "Hook, script, shot list, and caption",
+      "3 production blueprints per day",
+      "All 5 video formats",
+      "Video Strategy, Recording Guide, Voice Script, Editing Guide, and Publishing Package",
     ],
   },
   {
@@ -26,9 +26,9 @@ export const plans = [
     period: "/month",
     description: "For founders posting every week.",
     features: [
-      "More room to ship short-form content",
-      "All founder content workflows",
-      "Ready-to-film packages for TikTok, Shorts, and Reels",
+      "More room to ship short-form videos",
+      "All video production workflows",
+      "Ready-to-film production blueprints for TikTok, Shorts, and Reels",
     ],
   },
   {
@@ -38,8 +38,8 @@ export const plans = [
     period: "/month",
     description: "For founders posting more often.",
     features: [
-      "Higher-volume content workflow",
-      "All founder content workflows",
+      "Higher-volume video production workflow",
+      "All video production workflows",
       "Best for daily publishing",
     ],
   },

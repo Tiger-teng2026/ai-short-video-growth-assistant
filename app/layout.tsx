@@ -27,17 +27,20 @@ const siteUrl = getSiteUrl();
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: `${SITE_NAME} — SaaS Founder Content Workflow`,
+    default: `${SITE_NAME} — ${SITE_TAGLINE}`,
     template: `%s · ${SITE_NAME}`,
   },
   description: SITE_DESCRIPTION,
   applicationName: SITE_NAME,
   keywords: [
-    "SaaS short video",
-    "TikTok for SaaS founders",
-    "YouTube Shorts script",
-    "Instagram Reels content",
-    "founder content workflow",
+    "AI short video production assistant",
+    "SaaS production blueprint",
+    "video strategy",
+    "recording guide",
+    "voice script",
+    "editing guide",
+    "publishing package",
+    "TikTok YouTube Shorts Reels",
   ],
   authors: [{ name: SITE_NAME }],
   openGraph: {

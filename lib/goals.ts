@@ -31,7 +31,7 @@ Do not invent waitlist numbers, press quotes, or fake launch results.`,
   {
     id: "founder-brand",
     name: "Build Founder Brand",
-    description: "Create founder-focused content.",
+    description: "Create founder-focused videos.",
     prompt: `Video Goal: Build Founder Brand.
 Tune Video Strategy, Recording Guide, Voice Script, Editing Guide, Publishing Package, and Production Checklist toward a founder talking to other builders.
 Founder perspective is allowed: speak as a builder introducing the product.
@@ -43,7 +43,7 @@ If no founder background is in the input, use Problem insight → Solution → P
   {
     id: "educate",
     name: "Educate Audience",
-    description: "Create educational content for your target audience.",
+    description: "Create educational videos for your target audience.",
     prompt: `Video Goal: Educate Audience.
 Tune Video Strategy, Recording Guide, Voice Script, Editing Guide, Publishing Package, and Production Checklist toward one useful lesson.
 Lead with the lesson, then show how the product supports that lesson.

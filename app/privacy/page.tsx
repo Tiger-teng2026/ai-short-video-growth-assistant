@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Privacy Policy",
-  description: "How Growth Assistant collects, uses, and stores information.",
+  description: "How Production Assistant collects, uses, and stores information.",
 };
 
 export default function PrivacyPage() {
@@ -14,14 +14,15 @@ export default function PrivacyPage() {
       <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-900">
         Privacy Policy
       </h1>
-      <p className="mt-3 text-sm text-slate-500">Last updated: September 22, 2026</p>
+      <p className="mt-3 text-sm text-slate-500">Last updated: September 23, 2026</p>
 
       <div className="mt-10 space-y-8 text-sm leading-7 text-slate-700">
         <section>
           <h2 className="text-base font-semibold text-slate-900">Overview</h2>
           <p className="mt-2">
-            Growth Assistant is a content workflow tool for AI SaaS founders. This
-            product does not use a user account system or a product database.
+            Production Assistant is a video production workflow tool for SaaS
+            founders and product creators. This product does not use a user
+            account system or a product database.
           </p>
         </section>
 
@@ -32,7 +33,7 @@ export default function PrivacyPage() {
           <ul className="mt-2 list-disc space-y-2 pl-5">
             <li>
               Product descriptions and generation inputs you submit, used only to
-              create a content package.
+              create a production blueprint.
             </li>
             <li>
               Free-usage date and count stored in your browser with localStorage.
@@ -62,7 +63,7 @@ export default function PrivacyPage() {
             We do not use advertising cookies. If Google Analytics 4 is
             configured, gtag may set analytics cookies to measure product usage.
             Browser storage is also used for free usage limits, local analytics
-            events, and your latest content package.
+            events, and your latest production blueprint.
           </p>
         </section>
 

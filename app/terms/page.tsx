@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Terms of Service",
-  description: "Terms for using Growth Assistant.",
+  description: "Terms for using Production Assistant.",
 };
 
 export default function TermsPage() {
@@ -14,33 +14,33 @@ export default function TermsPage() {
       <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-900">
         Terms of Service
       </h1>
-      <p className="mt-3 text-sm text-slate-500">Last updated: September 22, 2026</p>
+      <p className="mt-3 text-sm text-slate-500">Last updated: September 23, 2026</p>
 
       <div className="mt-10 space-y-8 text-sm leading-7 text-slate-700">
         <section>
           <h2 className="text-base font-semibold text-slate-900">Service</h2>
           <p className="mt-2">
-            Growth Assistant helps SaaS founders turn a product idea into a
-            ready-to-film short video content package. It does not generate
-            finished videos or publish content to social platforms.
+            Production Assistant helps SaaS founders and product creators turn a
+            product idea into a ready-to-film short-video production blueprint.
+            It does not generate finished videos or publish to social platforms.
           </p>
         </section>
 
         <section>
           <h2 className="text-base font-semibold text-slate-900">Free use</h2>
           <p className="mt-2">
-            The Free plan is limited to 3 content packages per day, measured in
-            your browser. Limits may change. Paid plans are processed by Creem.
-            This version does not include account-based entitlements.
+            The Free plan is limited to 3 production blueprints per day, measured
+            in your browser. Limits may change. Paid plans are processed by
+            Creem. This version does not include account-based entitlements.
           </p>
         </section>
 
         <section>
           <h2 className="text-base font-semibold text-slate-900">Content</h2>
           <p className="mt-2">
-            Generated scripts, hooks, and shot lists are drafts for you to
-            review, edit, and film. You are responsible for the content you
-            publish, including claims, trademarks, and platform rules.
+            Generated production blueprints are drafts for you to review, edit,
+            and film. You are responsible for the videos you publish, including
+            claims, trademarks, and platform rules.
           </p>
         </section>
 
@@ -49,7 +49,7 @@ export default function TermsPage() {
           <p className="mt-2">
             We do not guarantee views, followers, revenue, or ranking on TikTok,
             YouTube, or Instagram. The product is provided as-is for founder
-            content planning.
+            video production planning.
           </p>
         </section>
 
