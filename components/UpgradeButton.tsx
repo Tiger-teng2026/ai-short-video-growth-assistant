@@ -34,13 +34,13 @@ export function UpgradeButton({
       } | null;
 
       if (!response.ok || !payload?.checkoutUrl) {
-        setError(payload?.error || "Unable to start checkout.");
+        setError(toCheckoutError(payload?.error, response.status));
         return;
       }
 
       window.location.assign(payload.checkoutUrl);
     } catch {
-      setError("Unable to start checkout.");
+      setError("Unable to start checkout. Please try again later.");
     } finally {
       setIsLoading(false);
     }
@@ -66,4 +66,16 @@ export function UpgradeButton({
       ) : null}
     </div>
   );
+}
+
+function toCheckoutError(message: string | undefined, status: number) {
+  if (
+    status === 400 &&
+    message &&
+    !/api[_-]?key|\.env|secret|token/i.test(message)
+  ) {
+    return message;
+  }
+
+  return "Unable to start checkout. Please try again later.";
 }

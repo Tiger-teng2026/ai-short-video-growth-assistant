@@ -19,13 +19,13 @@ export async function POST(request: Request) {
     const checkoutUrl = await createCreemCheckout({ plan, successUrl });
     return Response.json({ checkoutUrl });
   } catch (error) {
-    if (error instanceof CreemError) {
-      return Response.json({ error: error.message }, { status: error.status });
+    if (error instanceof CreemError && error.status === 400) {
+      return Response.json({ error: error.message }, { status: 400 });
     }
 
     return Response.json(
-      { error: "Failed to create checkout session." },
-      { status: 502 },
+      { error: "Unable to start checkout. Please try again later." },
+      { status: error instanceof CreemError ? error.status : 502 },
     );
   }
 }
