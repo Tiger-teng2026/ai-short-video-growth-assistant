@@ -13,7 +13,7 @@ export function GoogleAnalytics() {
   return (
     <>
       <Script
-        src={`https://www.googletagmanager.com/gtag/js?id=${measurementId}`}
+        src={`/gtag/js?id=${measurementId}`}
         strategy="afterInteractive"
       />
       <Script id="ga4-gtag" strategy="afterInteractive">
@@ -24,6 +24,8 @@ export function GoogleAnalytics() {
           gtag('js', new Date());
           gtag('config', '${measurementId}', {
             anonymize_ip: true,
+            transport_url: location.origin,
+            first_party_collection: true,
             debug_mode: /(?:^|[?&])debug_mode=true(?:&|$)/.test(location.search)
           });
         `}
