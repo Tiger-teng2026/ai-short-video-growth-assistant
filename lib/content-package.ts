@@ -69,10 +69,20 @@ export type VideoAssemblyClip = {
 };
 
 export type VideoAssemblyTransition = {
-  from: string;
-  to: string;
-  instruction: string;
+  fromScene: string;
+  toScene: string;
+  transitionType: string;
+  visualEffect: string;
+  duration: string;
+  editingAction: string;
+  reason: string;
 };
+
+const DEFAULT_TRANSITION_TYPE = "Hard Cut";
+const DEFAULT_TRANSITION_EFFECT = "No animation. Cut directly.";
+const DEFAULT_TRANSITION_DURATION = "0 seconds";
+const DEFAULT_TRANSITION_ACTION = "Cut directly to the next scene.";
+const DEFAULT_TRANSITION_REASON = "Keeps the video clear and easy to follow.";
 
 export type VideoAssembly = {
   clipOrder: VideoAssemblyClip[];
@@ -521,19 +531,55 @@ function parseAssemblyTransitions(raw: unknown): VideoAssemblyTransition[] {
     }
 
     const row = item as Record<string, unknown>;
-    const from = firstFilledString([row.from, row.source, row.sourceScene]);
-    const to = firstFilledString([row.to, row.target, row.nextScene]);
-    const instruction = firstFilledString([
+    const fromScene = firstFilledString([
+      row.fromScene,
+      row.from_scene,
+      row.from,
+      row.source,
+      row.sourceScene,
+    ]);
+    const toScene = firstFilledString([
+      row.toScene,
+      row.to_scene,
+      row.to,
+      row.target,
+      row.nextScene,
+    ]);
+
+    if (!fromScene || !toScene) {
+      return;
+    }
+
+    const editingAction = firstFilledString([
+      row.editingAction,
+      row.editing_action,
       row.instruction,
       row.transition,
       row.note,
     ]);
 
-    if (!from || !to || !instruction) {
-      return;
-    }
-
-    transitions.push({ from, to, instruction });
+    transitions.push({
+      fromScene,
+      toScene,
+      transitionType:
+        firstFilledString([
+          row.transitionType,
+          row.transition_type,
+          row.type,
+        ]) || DEFAULT_TRANSITION_TYPE,
+      visualEffect:
+        firstFilledString([
+          row.visualEffect,
+          row.visual_effect,
+          row.effect,
+        ]) || DEFAULT_TRANSITION_EFFECT,
+      duration:
+        firstFilledString([row.duration, row.transitionDuration]) ||
+        DEFAULT_TRANSITION_DURATION,
+      editingAction: editingAction || DEFAULT_TRANSITION_ACTION,
+      reason:
+        firstFilledString([row.reason, row.why]) || DEFAULT_TRANSITION_REASON,
+    });
   });
 
   return transitions;
@@ -553,9 +599,13 @@ function fallbackVideoAssembly(scenes: RecordingScene[]): VideoAssembly {
   const transitions = scenes.slice(0, -1).map((scene, index) => {
     const next = scenes[index + 1];
     return {
-      from: `Scene ${scene.scene}`,
-      to: `Scene ${next.scene}`,
-      instruction: `Switch to Scene ${next.scene} after Scene ${scene.scene}.`,
+      fromScene: `Scene ${scene.scene}`,
+      toScene: `Scene ${next.scene}`,
+      transitionType: DEFAULT_TRANSITION_TYPE,
+      visualEffect: DEFAULT_TRANSITION_EFFECT,
+      duration: DEFAULT_TRANSITION_DURATION,
+      editingAction: DEFAULT_TRANSITION_ACTION,
+      reason: DEFAULT_TRANSITION_REASON,
     };
   });
 
@@ -693,7 +743,10 @@ function fallbackExecutionWorkflow(context: {
           "Keep only what each Editing Instruction says to keep. Cut unused takes.",
           ...context.assembly.transitions
             .slice(0, 3)
-            .map((item) => item.instruction),
+            .map(
+              (item) =>
+                `${item.fromScene} → ${item.toScene}: ${item.editingAction}`,
+            ),
         ].filter(Boolean),
         checklist: [
           "Clips are in the Video Assembly order.",

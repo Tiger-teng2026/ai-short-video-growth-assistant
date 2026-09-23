@@ -246,10 +246,7 @@ export function ResultView() {
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                       <div className="min-w-0">
                         <p className="text-sm font-medium leading-6 text-slate-900">
-                          {transition.from} → {transition.to}
-                        </p>
-                        <p className="mt-1 text-sm leading-6 text-slate-700">
-                          {transition.instruction}
+                          {transition.fromScene} → {transition.toScene}
                         </p>
                       </div>
                       <div className="w-full shrink-0 sm:w-auto">
@@ -260,6 +257,29 @@ export function ResultView() {
                         />
                       </div>
                     </div>
+                    <dl className="mt-4 space-y-3">
+                      <SceneField
+                        label="Transition"
+                        value={displayValue(transition.transitionType)}
+                      />
+                      <SceneField
+                        label="Effect"
+                        value={displayValue(transition.visualEffect)}
+                      />
+                      <SceneField
+                        label="Duration"
+                        value={displayValue(transition.duration)}
+                      />
+                      <SceneField
+                        label="Editing Action"
+                        value={displayValue(transition.editingAction)}
+                        emphasis
+                      />
+                      <SceneField
+                        label="Why"
+                        value={displayValue(transition.reason)}
+                      />
+                    </dl>
                   </li>
                 ))}
               </ul>
@@ -484,7 +504,14 @@ function formatClipCopy(clip: VideoAssemblyClip): string {
 }
 
 function formatTransitionCopy(transition: VideoAssemblyTransition): string {
-  return `${transition.from} → ${transition.to}: ${transition.instruction}`;
+  return [
+    `${transition.fromScene} → ${transition.toScene}`,
+    `Transition: ${displayValue(transition.transitionType)}`,
+    `Effect: ${displayValue(transition.visualEffect)}`,
+    `Duration: ${displayValue(transition.duration)}`,
+    `Editing Action: ${displayValue(transition.editingAction)}`,
+    `Why: ${displayValue(transition.reason)}`,
+  ].join("\n");
 }
 
 function SceneCard({ scene }: { scene: RecordingScene }) {

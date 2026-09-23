@@ -50,9 +50,13 @@ const jsonExample = `{
     ],
     "transitions": [
       {
-        "from": "Scene 1",
-        "to": "Scene 2",
-        "instruction": "Switch to screen recording after explaining the problem."
+        "fromScene": "Scene 1",
+        "toScene": "Scene 2",
+        "transitionType": "Hard Cut",
+        "visualEffect": "No animation. Cut directly.",
+        "duration": "0 seconds",
+        "editingAction": "Cut immediately after the spoken sentence ends.",
+        "reason": "Keeps the video fast and clear."
       }
     ]
   },
@@ -95,7 +99,7 @@ const jsonExample = `{
         "goal": "Put the clips in order on the timeline.",
         "instructions": [
           "Drop clips in clipOrder.",
-          "Switch to the next clip using each one-sentence transition."
+          "Apply each scene transition using transitionType, duration, and editingAction."
         ],
         "checklist": [
           "Clips are in order.",
@@ -243,7 +247,7 @@ export function buildTemplatePrompt(
   const sceneBudget = getRecordingSceneBudget(input.videoLength);
   const clipBudget = getVideoAssemblyClipBudget(input.videoLength);
 
-  const systemPrompt = `You are an AI video production coach helping SaaS founders create complete short videos.
+  const systemPrompt = `You are a short video production coach and editor.
 
 Context:
 The user typed a product description. They will film the footage themselves. Return a production blueprint that helps them finish the video from recording to publishing — not a ChatGPT ad script.
@@ -251,6 +255,7 @@ The user typed a product description. They will film the footage themselves. Ret
 Your job:
 Create a ready-to-execute short video plan for TikTok, YouTube Shorts, or Instagram Reels.
 The user must be able to complete the video from recording to publishing.
+The user needs to complete the video without professional editing skills.
 Do not only give suggestions. Give clear actions.
 Write for a founder filming alone. Every line must tell them what to do now, how they know it is finished, and what happens next.
 Do not output professional editing lessons. Do not use complex video jargon.
@@ -291,8 +296,13 @@ Video Assembly rules:
 - Do not go outside that range.
 - Each clip must name: the source Scene, the position in the finished video, what to keep, and what to delete.
 - editingInstruction must say what to keep and what to delete in plain language.
-- Transitions: one simple sentence only.
-- Example: "Switch to screen recording after explaining the problem."
+- For every scene transition, provide simple editing instructions.
+- Each transition MUST include: fromScene, toScene, transitionType, visualEffect, duration, editingAction, reason.
+- Each transition must explain: 1) what transition effect to use, 2) how long it lasts, 3) when to apply it, 4) why it works.
+- Prefer simple professional transitions only: Hard Cut, Simple Zoom, Swipe, Fade.
+- Use Hard Cut unless another transition improves clarity.
+- Avoid complex effects, flashy animations, and cinematic transitions.
+- Do not generate complex editing advice.
 - Forbidden: "Add cinematic transition", "Use advanced effects", or any complex editing jargon.
 
 Execution Workflow rules:
@@ -327,7 +337,7 @@ Output rules:
 ${jsonExample}
 - recordingGuide: ${sceneBudget.label}. Scene 1 is 0-3s.
 - videoAssembly.clipOrder: ${clipBudget.label}. Each clip maps to a recordingGuide scene.
-- videoAssembly.transitions: one simple sentence between consecutive clips.
+- videoAssembly.transitions: one transition object between consecutive clips, with transitionType, visualEffect, duration, editingAction, and reason.
 - executionWorkflow.steps: exactly 5 steps with the fixed titles.
 - hooks: exactly 3 distinct spoken hooks. Do not repeat the same sentence.
 - script: copy voiceScript.
