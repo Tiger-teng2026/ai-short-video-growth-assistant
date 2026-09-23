@@ -182,8 +182,8 @@ export function GenerateForm() {
           Product Description
         </label>
         <p className="mt-1 text-sm leading-6 text-slate-500">
-          Describe the SaaS product you will film. The blueprint uses only facts
-          from this description.
+          Write what it does, who it is for, and one job it finishes. A few
+          sentences is enough. We only use the facts you type here.
         </p>
         <textarea
           id="product-description"
@@ -192,7 +192,7 @@ export function GenerateForm() {
           value={productDescription}
           disabled={isGenerating}
           onChange={(event) => setProductDescription(event.target.value)}
-          placeholder="AI tool that helps freelancers create invoices faster"
+          placeholder="AI invoice tool for freelancers. They describe the project, get a professional invoice, and send it in minutes."
           className="mt-4 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm leading-6 text-slate-900 outline-none placeholder:text-slate-400 focus:border-slate-400 disabled:opacity-60"
         />
       </section>
@@ -201,7 +201,7 @@ export function GenerateForm() {
         <p className="text-sm font-medium text-slate-500">Step 3</p>
         <h2 className="mt-1 text-lg font-semibold text-slate-900">Goal</h2>
         <p className="mt-1 text-sm leading-6 text-slate-500">
-          One goal. The Recording Guide and CTA follow this choice.
+          Pick one. The shots and the closing line follow this goal.
         </p>
         <div className="mt-4 space-y-3">
           {goals.map((option) => {
@@ -236,8 +236,7 @@ export function GenerateForm() {
         <p className="text-sm font-medium text-slate-500">Step 4</p>
         <h2 className="mt-1 text-lg font-semibold text-slate-900">Template</h2>
         <p className="mt-1 text-sm leading-6 text-slate-500">
-          Choose the video structure. Every template still returns the full
-          production blueprint.
+          Pick how the video should open. You still get the full filming plan.
         </p>
         <div className="mt-4 space-y-3">
           {templates.map((option) => {
@@ -313,6 +312,9 @@ export function GenerateForm() {
           </div>
         ) : (
           <>
+            <p className="mb-3 text-sm leading-6 text-slate-500">
+              No video experience needed. Phone plus this plan is enough.
+            </p>
             <button
               type="submit"
               disabled={isGenerating}

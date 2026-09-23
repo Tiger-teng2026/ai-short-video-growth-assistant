@@ -10,42 +10,42 @@ import {
 const heroValues = [
   {
     title: "Video Strategy",
-    body: "Concept, viewer, hook, promise, and one CTA before you film.",
+    body: "Who the video is for, what it must prove, and the one CTA before you press record.",
   },
   {
     title: "Recording Guide",
-    body: "Scene-by-scene shots, timing, and founder actions you can film on a phone.",
+    body: "Scene-by-scene camera shots, screen recordings, timing, and what you do on camera.",
   },
   {
     title: "Voice Script",
-    body: "Spoken opening, body, and CTA that match each scene.",
+    body: "The exact opening, body, and CTA lines to say with each scene.",
   },
   {
     title: "Editing Guide",
-    body: "Cuts, overlays, captions, and pacing so the cut is obvious.",
+    body: "Where to cut, what text to overlay, and how to caption so the edit is obvious.",
   },
   {
     title: "Publishing Package",
-    body: "Caption, hashtags, thumbnail line, and first comment ready to post.",
+    body: "Caption, hashtags, thumbnail line, and first comment ready to paste and post.",
   },
 ];
 
 const problems = [
-  "Don't know what to film first",
-  "No scene-by-scene recording plan",
-  "Scripts that don't match a real product demo",
+  "Don't know what to film in the first 3 seconds",
+  "No camera shot and screen-recording plan",
+  "Voiceover that does not match a real product demo",
 ];
 
 const workflow = [
   {
     step: "1",
     title: "Video Strategy",
-    body: "Decide who the video is for and what it must prove.",
+    body: "Pick the viewer, the product job, and the first 3 seconds.",
   },
   {
     step: "2",
     title: "Recording Guide",
-    body: "Film each scene with a clear shot, action, and on-screen frame.",
+    body: "Film each scene: camera, screen, and the action you take.",
   },
   {
     step: "3",
@@ -55,7 +55,7 @@ const workflow = [
   {
     step: "4",
     title: "Editing Guide",
-    body: "Cut, overlay, and caption from a shot list you already filmed.",
+    body: "Cut and caption from the scenes you already filmed.",
   },
   {
     step: "5",
@@ -121,19 +121,49 @@ export default function Home() {
           {SITE_TAGLINE}
         </p>
         <h1 className="mt-3 max-w-3xl text-4xl font-semibold tracking-tight text-slate-900 sm:text-5xl sm:leading-tight">
-          Turn a product idea into a short-video production blueprint
+          Turn Your SaaS Idea Into a Video You Can Actually Record
         </h1>
         <p className="mt-5 max-w-2xl text-lg leading-8 text-slate-600">
-          Help SaaS founders and product creators turn a product idea into a
-          professional short-video production blueprint: Video Strategy,
-          Recording Guide, Voice Script, Editing Guide, and Publishing Package.
+          Get a step-by-step video plan with camera shots, screen recordings,
+          voice scripts, and editing guidance for your next product video.
         </p>
         <Link
           href="/generate"
           className="mt-8 inline-flex h-12 items-center rounded-lg bg-slate-900 px-6 text-sm font-medium text-white transition-colors hover:bg-slate-800"
         >
-          Create My Production Blueprint
+          Create My Video Plan Free
         </Link>
+      </section>
+
+      <section className="pb-16">
+        <p className="text-sm font-medium uppercase tracking-wide text-slate-500">
+          See what you get
+        </p>
+        <h2 className="mt-2 text-2xl font-semibold tracking-tight text-slate-900">
+          A video plan you can film on a phone.
+        </h2>
+        <article className="mt-6 rounded-xl border border-slate-200 bg-white p-5 sm:p-6">
+          <p className="text-sm text-slate-500">
+            Product: AI invoice tool for freelancers
+          </p>
+          <h3 className="mt-4 text-sm font-semibold text-slate-900">
+            Scene 1 (0-3s)
+          </h3>
+          <div className="mt-3 space-y-3 text-sm leading-7 text-slate-700">
+            <p>
+              <span className="font-semibold text-slate-900">Camera. </span>
+              Show a messy invoice spreadsheet
+            </p>
+            <p>
+              <span className="font-semibold text-slate-900">Screen. </span>
+              Open your invoice workflow
+            </p>
+            <p>
+              <span className="font-semibold text-slate-900">Voice. </span>
+              Still creating invoices manually?
+            </p>
+          </div>
+        </article>
       </section>
 
       <section className="pb-16">
@@ -157,7 +187,7 @@ export default function Home() {
           Problem
         </p>
         <h2 className="mt-2 text-2xl font-semibold tracking-tight text-slate-900">
-          Most founders get stuck before they press record.
+          Most founders stall before the first take.
         </h2>
         <ul className="mt-6 space-y-3">
           {problems.map((item) => (
@@ -174,7 +204,7 @@ export default function Home() {
           Workflow
         </p>
         <h2 className="mt-2 text-2xl font-semibold tracking-tight text-slate-900">
-          From product idea to a blueprint you can film, edit, and publish.
+          From one product idea to a video plan you can record today.
         </h2>
         <ol className="mt-8 grid gap-4 sm:grid-cols-5">
           {workflow.map((item, index) => (

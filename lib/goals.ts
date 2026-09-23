@@ -8,8 +8,8 @@ export type VideoGoal = {
 export const goals: VideoGoal[] = [
   {
     id: "get-users",
-    name: "Get First Users",
-    description: "Create videos designed to attract your first users.",
+    name: "Get people to try it",
+    description: "A stranger understands the job and wants a walkthrough.",
     prompt: `Video Goal: Get First Users.
 Tune Video Strategy, Recording Guide, Voice Script, Editing Guide, Publishing Package, and Production Checklist so a stranger understands the product job and wants a walkthrough.
 Emphasize one benefit a first-time viewer can grasp in seconds.
@@ -19,8 +19,8 @@ Do not invent social proof, user counts, or personal founder experience.`,
   },
   {
     id: "launch-product",
-    name: "Launch Product",
-    description: "Create launch announcement videos.",
+    name: "Announce a launch",
+    description: "Say what shipped, who it is for, and what to do next.",
     prompt: `Video Goal: Launch Product.
 Tune Video Strategy, Recording Guide, Voice Script, Editing Guide, Publishing Package, and Production Checklist as a first public drop.
 State what is shipping, who it is for, and what to do next.
@@ -30,8 +30,8 @@ Do not invent waitlist numbers, press quotes, or fake launch results.`,
   },
   {
     id: "founder-brand",
-    name: "Build Founder Brand",
-    description: "Create founder-focused videos.",
+    name: "Talk as the founder",
+    description: "You appear on camera and introduce the product.",
     prompt: `Video Goal: Build Founder Brand.
 Tune Video Strategy, Recording Guide, Voice Script, Editing Guide, Publishing Package, and Production Checklist toward a founder talking to other builders.
 Founder perspective is allowed: speak as a builder introducing the product.
@@ -42,8 +42,8 @@ If no founder background is in the input, use Problem insight → Solution → P
   },
   {
     id: "educate",
-    name: "Educate Audience",
-    description: "Create educational videos for your target audience.",
+    name: "Teach one useful thing",
+    description: "One lesson first. Then show how the product helps.",
     prompt: `Video Goal: Educate Audience.
 Tune Video Strategy, Recording Guide, Voice Script, Editing Guide, Publishing Package, and Production Checklist toward one useful lesson.
 Lead with the lesson, then show how the product supports that lesson.

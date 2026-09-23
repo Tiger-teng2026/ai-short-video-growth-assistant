@@ -1,7 +1,7 @@
 export const SITE_NAME = "Production Assistant";
 export const SITE_TAGLINE = "AI Short Video Production Assistant";
 export const SITE_DESCRIPTION =
-  "Help SaaS founders and product creators turn a product idea into a professional short-video production blueprint.";
+  "Get a step-by-step video plan with camera shots, screen recordings, voice scripts, and editing guidance for your next SaaS product video.";
 
 export function getSiteUrl(): string {
   const fromEnv = process.env.APP_URL?.trim().replace(/\/$/, "");

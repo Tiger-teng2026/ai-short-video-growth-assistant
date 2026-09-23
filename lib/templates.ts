@@ -70,8 +70,8 @@ const jsonExample = `{
 export const templates: ContentTemplate[] = [
   {
     id: "product-demo",
-    name: "Product Demo",
-    description: "Show your product in action",
+    name: "Show the product",
+    description: "Film a short walkthrough on screen.",
     prompt: `Template: Product Demo.
 Build a production blueprint a founder can film alone on a phone.
 Video Strategy must name one job and one show-the-product flow.
@@ -84,8 +84,8 @@ One job, one workflow, one CTA.`,
   },
   {
     id: "problem-solution",
-    name: "Problem Solution",
-    description: "Explain why your product matters",
+    name: "Pain, then the fix",
+    description: "Open on the broken process, then show the product.",
     prompt: `Template: Problem Solution.
 Build a production blueprint that opens on a category pain, then shows the product as the fix.
 Recording Guide should film the broken process, then an executable product walkthrough.
@@ -96,8 +96,8 @@ Name the broken process in concrete terms. Do not write a generic brand ad.`,
   },
   {
     id: "founder-story",
-    name: "Founder Story",
-    description: "Share why you built it",
+    name: "Founder on camera",
+    description: "Talk as the builder. No fake origin story.",
     prompt: `Template: Founder Story.
 Build a production blueprint a founder can film on a phone.
 If the user input includes a real founder story (why they are building it, a real origin, a real constraint): film THAT story only. Do not add facts.
@@ -108,8 +108,8 @@ Forbidden: "I built this because", "I used to spend", fake clients, fake nights,
   },
   {
     id: "educational-tip",
-    name: "Educational Tip",
-    description: "Teach your audience something useful",
+    name: "One useful tip",
+    description: "Teach one thing. The product supports the tip.",
     prompt: `Template: Educational Tip.
 Build a production blueprint that teaches one useful industry tip in the product's domain.
 The viewer should learn the tip even if they never sign up.
@@ -120,8 +120,8 @@ One lesson, then one product moment.`,
   },
   {
     id: "social-proof",
-    name: "Social Proof",
-    description: "Show customer value",
+    name: "Show the value",
+    description: "Use a real result if you have one. Otherwise show the job.",
     prompt: `Template: Social Proof.
 Build a production blueprint around value, not hype.
 If the user input includes a real customer case (named outcome, quote, or metric they provided): film that case only. Do not inflate it.

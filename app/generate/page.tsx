@@ -17,6 +17,9 @@ export default function GeneratePage() {
         Enter your SaaS product, pick a goal and template, and get a filming
         plan you can shoot on a phone.
       </p>
+      <p className="mt-3 text-sm font-medium leading-6 text-slate-700">
+        No video experience needed.
+      </p>
       <ul className="mt-5 space-y-2 text-sm leading-6 text-slate-600">
         <li>Video Strategy</li>
         <li>Recording Guide</li>
