@@ -74,6 +74,78 @@ const jsonExample = `{
     "Film scene 1 as a 0-3s hook",
     "Record each voiceover line with its scene"
   ],
+  "executionWorkflow": {
+    "steps": [
+      {
+        "stepNumber": 1,
+        "title": "Record Your Clips",
+        "goal": "Film every scene on your phone.",
+        "instructions": [
+          "Shoot scene 1 as the 0-3s hook.",
+          "Then film the remaining scenes in order."
+        ],
+        "checklist": [
+          "Scene 1 is filmed.",
+          "Every later scene is filmed."
+        ]
+      },
+      {
+        "stepNumber": 2,
+        "title": "Put Clips Together",
+        "goal": "Put the clips in order on the timeline.",
+        "instructions": [
+          "Drop clips in clipOrder.",
+          "Switch to the next clip using each one-sentence transition."
+        ],
+        "checklist": [
+          "Clips are in order.",
+          "Unused takes are cut."
+        ]
+      },
+      {
+        "stepNumber": 3,
+        "title": "Add Voice, Text & Captions",
+        "goal": "Add spoken lines, on-screen text, and captions.",
+        "instructions": [
+          "Keep the scene Voiceover. Use the full Voice Script only as a copy helper.",
+          "Add each scene on-screen text.",
+          "Burn in captions."
+        ],
+        "checklist": [
+          "On-screen text is added.",
+          "Captions are added."
+        ]
+      },
+      {
+        "stepNumber": 4,
+        "title": "Final Video Check",
+        "goal": "Watch once and confirm the video is ready.",
+        "instructions": [
+          "Play the video from start to end.",
+          "Check the first 3 seconds, the product moment, and the CTA."
+        ],
+        "checklist": [
+          "The hook is clear.",
+          "One CTA is spoken and on screen."
+        ]
+      },
+      {
+        "stepNumber": 5,
+        "title": "Publish Your Video",
+        "goal": "Post with caption, hashtags, and CTA.",
+        "instructions": [
+          "Paste the caption.",
+          "Add the hashtags.",
+          "Use the single CTA."
+        ],
+        "checklist": [
+          "Caption is pasted.",
+          "Hashtags are added.",
+          "CTA is posted."
+        ]
+      }
+    ]
+  },
   "hooks": ["hook 1", "hook 2", "hook 3"],
   "script": {
     "opening": "same as voiceScript.opening",
@@ -171,14 +243,16 @@ export function buildTemplatePrompt(
   const sceneBudget = getRecordingSceneBudget(input.videoLength);
   const clipBudget = getVideoAssemblyClipBudget(input.videoLength);
 
-  const systemPrompt = `You are an AI short video production assistant helping SaaS founders create complete short videos.
+  const systemPrompt = `You are an AI video production coach helping SaaS founders create complete short videos.
 
 Context:
-The user typed a product description. They will film the footage themselves. Return a production blueprint that helps them finish Idea → Recording → Assembly → Publishing — not a ChatGPT ad script.
+The user typed a product description. They will film the footage themselves. Return a production blueprint that helps them finish the video from recording to publishing — not a ChatGPT ad script.
 
 Your job:
-Create a ready-to-film and ready-to-assemble production blueprint for TikTok, YouTube Shorts, or Instagram Reels.
-Write for a founder filming alone. Every line must tell them what to point the camera at, what to do, what to say, what text to put on screen, and how to put the clips together after filming.
+Create a ready-to-execute short video plan for TikTok, YouTube Shorts, or Instagram Reels.
+The user must be able to complete the video from recording to publishing.
+Do not only give suggestions. Give clear actions.
+Write for a founder filming alone. Every line must tell them what to do now, how they know it is finished, and what happens next.
 Do not output professional editing lessons. Do not use complex video jargon.
 
 Anti-fabrication rules:
@@ -221,6 +295,19 @@ Video Assembly rules:
 - Example: "Switch to screen recording after explaining the problem."
 - Forbidden: "Add cinematic transition", "Use advanced effects", or any complex editing jargon.
 
+Execution Workflow rules:
+- You MUST include executionWorkflow with exactly 5 steps.
+- Step titles must be exactly:
+  1. Record Your Clips
+  2. Put Clips Together
+  3. Add Voice, Text & Captions
+  4. Final Video Check
+  5. Publish Your Video
+- Every step must answer: What should I do now? How do I know it is finished? What happens next?
+- instructions = clear actions for "what should I do now".
+- checklist = how the founder knows the step is finished.
+- Do not write coaching essays. Write actions the founder can do today.
+
 CTA rules:
 - One CTA only. It must match the video goal.
 - publishingPackage.ctaOptions must contain exactly that one CTA.
@@ -228,8 +315,8 @@ CTA rules:
 - Do not offer a second CTA.
 
 Quality rules:
-- Include all seven sections: Video Strategy, Recording Guide, Video Assembly, Voice Script, Editing Guide, Publishing Package, Production Checklist.
-- Voiceover is per scene, not one long paragraph.
+- Include Video Strategy, Recording Guide, Video Assembly, Voice Script, Editing Guide, Publishing Package, Production Checklist, and executionWorkflow.
+- Voiceover is per scene, not one long paragraph. executionWorkflow must not rewrite those lines as a second script.
 - Editing Guide must be doable in CapCut or iPhone edit.
 - Stay native to ${input.platform}.
 - Match ${input.videoLength}.
@@ -241,6 +328,7 @@ ${jsonExample}
 - recordingGuide: ${sceneBudget.label}. Scene 1 is 0-3s.
 - videoAssembly.clipOrder: ${clipBudget.label}. Each clip maps to a recordingGuide scene.
 - videoAssembly.transitions: one simple sentence between consecutive clips.
+- executionWorkflow.steps: exactly 5 steps with the fixed titles.
 - hooks: exactly 3 distinct spoken hooks. Do not repeat the same sentence.
 - script: copy voiceScript.
 - shotList: one line per scene.
@@ -276,6 +364,7 @@ Use only facts in the product description. If founder background or a real custo
 Scene 1 must be 0-3s with a first-second picture and a first spoken sentence.
 Give an executable product walkthrough when the product is shown.
 Include videoAssembly so the founder can put recorded clips together after filming.
+Include executionWorkflow so the founder can finish recording, assembly, captions, check, and publishing.
 Use one CTA from the video goal. Never write Try it free or Link in bio.
 
 Return json only.`;
@@ -291,7 +380,7 @@ function getGoalContext(goalRef: string): string {
 
   return `Video Goal Context:
 ${goal.prompt}
-Adjust Video Strategy, Recording Guide, Video Assembly, Voice Script, Editing Guide, Publishing Package, and Production Checklist so they serve this goal.`;
+Adjust Video Strategy, Recording Guide, Video Assembly, Voice Script, Editing Guide, Publishing Package, Production Checklist, and executionWorkflow so they serve this goal.`;
 }
 
 function getPlatformRules(platform: string): string {

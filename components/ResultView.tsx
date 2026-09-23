@@ -6,7 +6,9 @@ import { CopyButton } from "@/components/CopyButton";
 import { trackEvent } from "@/lib/analytics";
 import {
   CONTENT_PACKAGE_STORAGE_KEY,
+  EXECUTION_STEP_TITLES,
   parseContentPackage,
+  type ExecutionStep,
   type RecordingScene,
   type StoredContentPackage,
   type VideoAssemblyClip,
@@ -70,7 +72,7 @@ export function ResultView() {
         <p className="mt-3 text-slate-600 leading-7">
           {invalid
             ? "This production blueprint could not be loaded. The saved data is missing or invalid."
-            : "Enter a product idea to get a scene-by-scene filming plan."}
+            : "Enter a product idea to get a 5-step plan from recording to publishing."}
         </p>
         <Link
           href="/generate"
@@ -121,13 +123,6 @@ export function ResultView() {
     `Body: ${voice.body}`,
     `CTA: ${voice.cta}`,
   ].join("\n\n");
-  const editingText = [
-    `Pacing: ${pack.editingGuide.pacing}`,
-    `Cuts:\n${pack.editingGuide.cuts.map((cut) => `- ${cut}`).join("\n")}`,
-    `Text overlay: ${pack.editingGuide.textOverlay}`,
-    `Music: ${pack.editingGuide.music}`,
-    `Captions: ${pack.editingGuide.captions}`,
-  ].join("\n\n");
   const publishingText = [
     `Caption: ${pack.publishingPackage.caption}`,
     `Hashtags: ${pack.publishingPackage.hashtags.join(" ")}`,
@@ -138,6 +133,36 @@ export function ResultView() {
   const checklistText = pack.productionChecklist
     .map((item, index) => `${index + 1}. ${item}`)
     .join("\n");
+  const workflow = pack.executionWorkflow?.steps?.length
+    ? pack.executionWorkflow.steps
+    : [];
+  const steps = EXECUTION_STEP_TITLES.map((title, index) => {
+    const match = workflow.find((step) => step.stepNumber === index + 1);
+    return {
+      stepNumber: index + 1,
+      title: match?.title || title,
+      goal: match?.goal || "",
+      instructions: match?.instructions ?? [],
+      checklist: match?.checklist ?? [],
+    } satisfies ExecutionStep;
+  });
+  const onScreenTextItems = scenes
+    .map((scene) => ({
+      scene: scene.scene,
+      text: scene.onScreenText.trim(),
+    }))
+    .filter((item) => item.text);
+  const onScreenTextCopy = onScreenTextItems
+    .map((item) => `Scene ${item.scene}: ${item.text}`)
+    .join("\n");
+  const step3Copy = [
+    onScreenTextCopy ? `On-screen text\n${onScreenTextCopy}` : "",
+    `Voice script copy helper\n${voiceText}`,
+    `Captions: ${pack.editingGuide.captions}`,
+    `Text overlay: ${pack.editingGuide.textOverlay}`,
+  ]
+    .filter(Boolean)
+    .join("\n\n");
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6 sm:py-16">
@@ -145,10 +170,10 @@ export function ResultView() {
         Production Blueprint Workspace
       </p>
       <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">
-        Start with the Recording Guide
+        Make this video in 5 steps
       </h1>
       <p className="mt-3 max-w-2xl text-slate-600 leading-7">
-        Record your clips, put them together, and publish your short video.
+        Follow these steps from recording to publishing.
       </p>
 
       <dl className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
@@ -158,13 +183,31 @@ export function ResultView() {
         <MetaItem label="Video Length" value={pack.videoLength} />
       </dl>
 
+      <ol className="mt-8 grid grid-cols-1 gap-2 sm:grid-cols-5">
+        {steps.map((step) => (
+          <li
+            key={`step-nav-${step.stepNumber}`}
+            className="rounded-lg border border-slate-200 bg-white px-3 py-3"
+          >
+            <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+              Step {step.stepNumber}
+            </p>
+            <p className="mt-1 text-sm font-medium leading-5 text-slate-900">
+              {step.title}
+            </p>
+          </li>
+        ))}
+      </ol>
+
       <div className="mt-10 space-y-5 sm:space-y-6">
         <PackageSection
           number="01"
-          title="Recording Guide"
-          description="Highest priority. Shoot each scene in order. Camera, action, and screen are written so you can film on a phone."
+          stepLabel="STEP 1"
+          title="Record Your Clips"
+          description={steps[0].goal || "Shoot each scene in the Recording Guide."}
           copyText={recordingText}
           featured
+          step={steps[0]}
         >
           <ol className="space-y-5">
             {scenes.map((scene, index) => (
@@ -175,9 +218,14 @@ export function ResultView() {
 
         <PackageSection
           number="02"
-          title="Video Assembly"
-          description="After you film, put the clips in this order. Each clip says what to keep and what to cut."
+          stepLabel="STEP 2"
+          title="Put Clips Together"
+          description={
+            steps[1].goal ||
+            "Put the recorded clips in this order and make the simple switches."
+          }
           copyText={assemblyText}
+          step={steps[1]}
         >
           <ol className="space-y-5">
             {assembly.clipOrder.map((clip, index) => (
@@ -221,46 +269,100 @@ export function ResultView() {
 
         <PackageSection
           number="03"
-          title="Voice Script"
-          description="Spoken lines to record with the scenes above."
-          copyText={voiceText}
+          stepLabel="STEP 3"
+          title="Add Voice, Text & Captions"
+          description={
+            steps[2].goal ||
+            "Add on-screen text and captions. Scene Voiceover stays in Step 1."
+          }
+          copyText={step3Copy}
+          step={steps[2]}
         >
-          <div className="space-y-4 text-sm leading-7 text-slate-700">
-            <Fact label="Opening" value={voice.opening} />
-            <Fact label="Body" value={voice.body} />
-            <Fact label="CTA" value={voice.cta} />
+          <div className="space-y-5">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                On-screen Text
+              </p>
+              {onScreenTextItems.length > 0 ? (
+                <ul className="mt-3 space-y-3">
+                  {onScreenTextItems.map((item) => (
+                    <li
+                      key={`on-screen-${item.scene}`}
+                      className="flex flex-col gap-3 rounded-lg border border-slate-100 bg-slate-50 p-3 sm:flex-row sm:items-start sm:justify-between"
+                    >
+                      <p className="text-sm leading-7 text-slate-900">
+                        <span className="mr-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                          Scene {item.scene}
+                        </span>
+                        {item.text}
+                      </p>
+                      <CopyButton
+                        text={item.text}
+                        source={`On-screen Text Scene ${item.scene}`}
+                        compact
+                      />
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="mt-2 text-sm leading-6 text-slate-600">
+                  Use the on-screen text written in each Recording Guide scene.
+                </p>
+              )}
+            </div>
+            <Fact label="Captions" value={pack.editingGuide.captions} />
+            <Fact label="Text overlay" value={pack.editingGuide.textOverlay} />
+            <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50 p-4">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                    Voice Script copy helper
+                  </p>
+                  <p className="mt-1 text-sm leading-6 text-slate-600">
+                    Scene Voiceover in Step 1 is what you say while filming. Copy
+                    this only if you need the full script in one place.
+                  </p>
+                </div>
+                <CopyButton text={voiceText} source="Voice Script" compact />
+              </div>
+            </div>
           </div>
         </PackageSection>
 
         <PackageSection
           number="04"
-          title="Quick Editing Tips"
-          description="A few simple notes to cut, caption, and finish the video without an editor."
-          copyText={editingText}
+          stepLabel="STEP 4"
+          title="Final Video Check"
+          description={
+            steps[3].goal || "Watch the finished video once before you publish."
+          }
+          copyText={checklistText}
+          step={steps[3]}
         >
-          <div className="space-y-4">
-            <Fact label="Pacing" value={pack.editingGuide.pacing} />
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                Cuts
-              </p>
-              <ul className="mt-2 space-y-2 text-sm leading-6 text-slate-700">
-                {pack.editingGuide.cuts.map((cut, index) => (
-                  <li key={`cut-${index}`}>{cut}</li>
-                ))}
-              </ul>
-            </div>
-            <Fact label="Text overlay" value={pack.editingGuide.textOverlay} />
-            <Fact label="Music" value={pack.editingGuide.music} />
-            <Fact label="Captions" value={pack.editingGuide.captions} />
-          </div>
+          <ul className="space-y-3">
+            {pack.productionChecklist.map((item, index) => (
+              <li
+                key={`check-${index}`}
+                className="flex items-start gap-2 text-sm leading-6 text-slate-700"
+              >
+                <span className="mt-0.5 shrink-0 text-slate-900" aria-hidden>
+                  {index + 1}.
+                </span>
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
         </PackageSection>
 
         <PackageSection
           number="05"
-          title="Publishing Package"
-          description="Paste-ready assets for the post, cover, and first comment."
+          stepLabel="STEP 5"
+          title="Publish Your Video"
+          description={
+            steps[4].goal || "Post with the caption, hashtags, and CTA."
+          }
           copyText={publishingText}
+          step={steps[4]}
         >
           <div className="space-y-4">
             <Fact label="Caption" value={pack.publishingPackage.caption} />
@@ -269,12 +371,8 @@ export function ResultView() {
               value={pack.publishingPackage.hashtags.join(" ")}
             />
             <Fact
-              label="Thumbnail text"
-              value={pack.publishingPackage.thumbnailText}
-            />
-            <Fact
-              label="First comment"
-              value={pack.publishingPackage.firstComment}
+              label="CTA"
+              value={pack.publishingPackage.ctaOptions.join(" ")}
             />
             <ul className="space-y-3">
               {pack.publishingPackage.ctaOptions.map((item, index) => (
@@ -298,28 +396,7 @@ export function ResultView() {
 
         <PackageSection
           number="06"
-          title="Production Checklist"
-          description="Finish these steps before you publish."
-          copyText={checklistText}
-        >
-          <ul className="space-y-3">
-            {pack.productionChecklist.map((item, index) => (
-              <li
-                key={`check-${index}`}
-                className="flex items-start gap-2 text-sm leading-6 text-slate-700"
-              >
-                <span className="mt-0.5 shrink-0 text-slate-900" aria-hidden>
-                  {index + 1}.
-                </span>
-                <span>{item}</span>
-              </li>
-            ))}
-          </ul>
-        </PackageSection>
-
-        <PackageSection
-          number=""
-          title="Video Strategy"
+          title="Why This Video Works"
           description="What this video is for, who it talks to, and how it should open."
           copyText={strategyText}
         >
@@ -606,18 +683,22 @@ function Fact({
 
 function PackageSection({
   number,
+  stepLabel,
   title,
   description,
   copyText,
   children,
   featured = false,
+  step,
 }: {
   number: string;
+  stepLabel?: string;
   title: string;
   description: string;
   copyText: string;
   children: ReactNode;
   featured?: boolean;
+  step?: ExecutionStep;
 }) {
   return (
     <section
@@ -629,14 +710,20 @@ function PackageSection({
     >
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0">
-          {featured ? (
-            <p className="text-xs font-semibold uppercase tracking-wide text-slate-900">
-              Start here
+          {stepLabel ? (
+            <p
+              className={`text-xs font-semibold uppercase tracking-wide ${
+                featured ? "text-slate-900" : "text-slate-500"
+              }`}
+            >
+              {stepLabel}
             </p>
           ) : null}
           <h2
             className={`font-semibold text-slate-900 ${
-              featured ? "mt-1 text-lg sm:text-xl" : "text-sm sm:text-base"
+              featured
+                ? `${stepLabel ? "mt-1" : ""} text-lg sm:text-xl`
+                : `${stepLabel ? "mt-1" : ""} text-sm sm:text-base`
             }`}
           >
             {number ? <span className="mr-2 text-slate-400">{number}</span> : null}
@@ -648,6 +735,34 @@ function PackageSection({
           <CopyButton text={copyText} source={title} />
         </div>
       </div>
+      {step && (step.instructions.length > 0 || step.checklist.length > 0) ? (
+        <div className="mt-4 grid gap-4 sm:grid-cols-2">
+          {step.instructions.length > 0 ? (
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                Do this now
+              </p>
+              <ul className="mt-2 space-y-2 text-sm leading-6 text-slate-700">
+                {step.instructions.map((item, index) => (
+                  <li key={`${title}-instruction-${index}`}>{item}</li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
+          {step.checklist.length > 0 ? (
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                Done when
+              </p>
+              <ul className="mt-2 space-y-2 text-sm leading-6 text-slate-700">
+                {step.checklist.map((item, index) => (
+                  <li key={`${title}-done-${index}`}>{item}</li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
+        </div>
+      ) : null}
       <div className="mt-4">{children}</div>
     </section>
   );

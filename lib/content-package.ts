@@ -95,6 +95,26 @@ export type PublishingPackage = {
   firstComment: string;
 };
 
+export type ExecutionStep = {
+  stepNumber: number;
+  title: string;
+  goal: string;
+  instructions: string[];
+  checklist: string[];
+};
+
+export type ExecutionWorkflow = {
+  steps: ExecutionStep[];
+};
+
+export const EXECUTION_STEP_TITLES = [
+  "Record Your Clips",
+  "Put Clips Together",
+  "Add Voice, Text & Captions",
+  "Final Video Check",
+  "Publish Your Video",
+] as const;
+
 export type ProductionBlueprint = {
   videoStrategy: VideoStrategy;
   recordingGuide: RecordingScene[];
@@ -103,6 +123,7 @@ export type ProductionBlueprint = {
   editingGuide: EditingGuide;
   publishingPackage: PublishingPackage;
   productionChecklist: string[];
+  executionWorkflow: ExecutionWorkflow;
 };
 
 export type ContentPackage = ProductionBlueprint & {
@@ -272,6 +293,17 @@ export function parseContentPackage(raw: unknown): ContentPackage {
     DEFAULT_CHECKLIST,
   ]);
 
+  const executionWorkflow = parseExecutionWorkflow(
+    readObject(data, ["executionWorkflow", "execution_workflow"]),
+    {
+      scenes: recordingGuide,
+      assembly: videoAssembly,
+      voice: script,
+      publishing: publishingPackage,
+      checklist: productionChecklist,
+    },
+  );
+
   return {
     videoStrategy,
     recordingGuide,
@@ -280,6 +312,7 @@ export function parseContentPackage(raw: unknown): ContentPackage {
     editingGuide,
     publishingPackage,
     productionChecklist,
+    executionWorkflow,
     hooks: hooks.slice(0, 3),
     script,
     shotList,
@@ -527,6 +560,196 @@ function fallbackVideoAssembly(scenes: RecordingScene[]): VideoAssembly {
   });
 
   return { clipOrder, transitions };
+}
+
+function parseExecutionWorkflow(
+  raw: Record<string, unknown> | null,
+  context: {
+    scenes: RecordingScene[];
+    assembly: VideoAssembly;
+    voice: VoiceScript;
+    publishing: PublishingPackage;
+    checklist: string[];
+  },
+): ExecutionWorkflow {
+  const fallback = fallbackExecutionWorkflow(context);
+  const parsed = parseExecutionSteps(
+    raw ? readValue(raw, ["steps"]) : undefined,
+  );
+
+  if (parsed.length === 0) {
+    return fallback;
+  }
+
+  return {
+    steps: fallback.steps.map((defaultStep) => {
+      const match =
+        parsed.find((step) => step.stepNumber === defaultStep.stepNumber) ||
+        parsed.find(
+          (step) =>
+            step.title.toLowerCase() === defaultStep.title.toLowerCase(),
+        );
+
+      if (!match) {
+        return defaultStep;
+      }
+
+      return {
+        stepNumber: defaultStep.stepNumber,
+        title: defaultStep.title,
+        goal: match.goal || defaultStep.goal,
+        instructions:
+          match.instructions.length > 0
+            ? match.instructions
+            : defaultStep.instructions,
+        checklist:
+          match.checklist.length > 0 ? match.checklist : defaultStep.checklist,
+      };
+    }),
+  };
+}
+
+function parseExecutionSteps(raw: unknown): ExecutionStep[] {
+  if (!Array.isArray(raw)) {
+    return [];
+  }
+
+  const steps: ExecutionStep[] = [];
+
+  raw.forEach((item, index) => {
+    if (!item || typeof item !== "object") {
+      return;
+    }
+
+    const row = item as Record<string, unknown>;
+    const title = firstFilledString([row.title, row.name]);
+    const goal = firstFilledString([row.goal, row.purpose]);
+    const instructions = firstFilledArray([
+      optionalStringArray(row.instructions),
+      optionalStringArray(row.actions),
+    ]);
+    const checklist = firstFilledArray([
+      optionalStringArray(row.checklist),
+      optionalStringArray(row.doneWhen),
+      optionalStringArray(row.done_when),
+    ]);
+
+    if (!title && !goal && instructions.length === 0) {
+      return;
+    }
+
+    steps.push({
+      stepNumber:
+        typeof row.stepNumber === "number" && row.stepNumber > 0
+          ? row.stepNumber
+          : typeof row.step_number === "number" && row.step_number > 0
+            ? row.step_number
+            : index + 1,
+      title: title || EXECUTION_STEP_TITLES[index] || `Step ${index + 1}`,
+      goal,
+      instructions,
+      checklist,
+    });
+  });
+
+  return steps;
+}
+
+function fallbackExecutionWorkflow(context: {
+  scenes: RecordingScene[];
+  assembly: VideoAssembly;
+  voice: VoiceScript;
+  publishing: PublishingPackage;
+  checklist: string[];
+}): ExecutionWorkflow {
+  const sceneCount = context.scenes.length || context.assembly.clipOrder.length;
+  const clipCount = context.assembly.clipOrder.length || sceneCount;
+  const cta = context.publishing.ctaOptions[0] || context.voice.cta;
+
+  return {
+    steps: [
+      {
+        stepNumber: 1,
+        title: EXECUTION_STEP_TITLES[0],
+        goal: "Film every scene in the Recording Guide on your phone.",
+        instructions: [
+          `Shoot ${sceneCount || 3} scenes in order, starting with the 0-3s hook.`,
+          "For each scene, follow Camera Guidance, What To Film, and User Action.",
+          "Say the scene Voiceover while you film. Do not invent extra lines.",
+        ],
+        checklist: context.scenes.length
+          ? context.scenes.map(
+              (scene) =>
+                `Scene ${scene.scene} is filmed (${scene.duration || "full take"}).`,
+            )
+          : ["Every scene in the Recording Guide is filmed."],
+      },
+      {
+        stepNumber: 2,
+        title: EXECUTION_STEP_TITLES[1],
+        goal: "Put the recorded clips in video order and make the simple switches.",
+        instructions: [
+          `Drop ${clipCount || 3} clips on the timeline in clip order.`,
+          "Keep only what each Editing Instruction says to keep. Cut unused takes.",
+          ...context.assembly.transitions
+            .slice(0, 3)
+            .map((item) => item.instruction),
+        ].filter(Boolean),
+        checklist: [
+          "Clips are in the Video Assembly order.",
+          "Each unused take is cut.",
+          "Each listed scene transition is done.",
+        ],
+      },
+      {
+        stepNumber: 3,
+        title: EXECUTION_STEP_TITLES[2],
+        goal: "Add the spoken lines, on-screen text, and captions.",
+        instructions: [
+          "Use each scene Voiceover. The full Voice Script is only a copy helper.",
+          "Add the on-screen text from each scene.",
+          "Burn in captions so the video still works muted.",
+        ],
+        checklist: [
+          "On-screen text from every scene is on the video.",
+          "Captions are added.",
+          "The closing CTA is spoken and visible.",
+        ],
+      },
+      {
+        stepNumber: 4,
+        title: EXECUTION_STEP_TITLES[3],
+        goal: "Watch the finished video once and confirm it is ready to post.",
+        instructions: [
+          "Play the video from start to end without stopping.",
+          "Check the first 3 seconds, the product moment, and the CTA.",
+          "Confirm every spoken line and on-screen line uses only product facts.",
+        ],
+        checklist: [
+          "The hook lands in the first 3 seconds.",
+          "The product job is clear.",
+          "One CTA is spoken and on screen.",
+        ],
+      },
+      {
+        stepNumber: 5,
+        title: EXECUTION_STEP_TITLES[4],
+        goal: "Post the video with the caption, hashtags, and CTA.",
+        instructions: [
+          "Paste the caption as written.",
+          `Add the hashtags: ${context.publishing.hashtags.join(" ") || "#SaaS"}.`,
+          cta
+            ? `Use this CTA: ${cta}`
+            : "Use the single CTA from the publishing package.",
+        ],
+        checklist: [
+          "Caption is pasted.",
+          "Hashtags are added.",
+          "The CTA is in the video and the first comment.",
+        ],
+      },
+    ],
+  };
 }
 
 function formatSceneLine(scene: RecordingScene): string {
