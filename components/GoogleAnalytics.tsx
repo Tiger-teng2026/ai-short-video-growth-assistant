@@ -22,12 +22,18 @@ export function GoogleAnalytics() {
           function gtag(){dataLayer.push(arguments);}
           window.gtag = gtag;
           gtag('js', new Date());
-          gtag('config', '${measurementId}', {
+          var debugMode = /(?:^|[?&])debug_mode=true(?:&|$)/.test(location.search);
+          if (debugMode) {
+            gtag('set', { debug_mode: true });
+          }
+          var config = {
             anonymize_ip: true,
-            transport_url: location.origin,
-            first_party_collection: true,
-            debug_mode: /(?:^|[?&])debug_mode=true(?:&|$)/.test(location.search)
-          });
+            transport_url: location.origin
+          };
+          if (debugMode) {
+            config.debug_mode = true;
+          }
+          gtag('config', '${measurementId}', config);
         `}
       </Script>
     </>
